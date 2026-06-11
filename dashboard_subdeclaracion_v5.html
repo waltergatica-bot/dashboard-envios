@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Subdeclaración de Peso</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --navy:#0D1B2A;--blue:#185FA5;--blue-lt:#B5D4F4;--blue-bg:#E6F1FB;
+  --red:#A32D2D;--red-lt:#FCEBEB;--amber:#854F0B;--amber-lt:#FAEEDA;
+  --green:#3B6D11;--green-lt:#EAF3DE;--purple:#534AB7;--purple-lt:#EEEDFE;
+  --gd:#444441;--gm:#888780;--gl:#F1EFE8;--gb:#D3D1C7;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --r:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:#F0EEE8;color:var(--gd);font-size:13px}
+.hdr{background:var(--navy);padding:.875rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.hdr-t{color:#fff;font-size:15px;font-weight:600}
+.hdr-s{color:var(--blue-lt);font-size:11px;margin-top:2px}
+.hdr-b{background:rgba(255,255,255,.1);color:var(--gb);font-size:10.5px;padding:3px 10px;border-radius:20px}
+.hdr-b span{color:#fff;font-weight:600}
+.nota{background:#FEF9EC;border-left:4px solid #C8961A;border-radius:0 var(--r) var(--r) 0;padding:.45rem .875rem;margin:.625rem 0;font-size:11px;color:#6B4C0B}
+.nota strong{color:#4A3307}
+.wrap{padding:.875rem 1.125rem;max-width:1500px;margin:0 auto}
+.sec{font-size:10.5px;font-weight:700;color:var(--gm);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.45rem}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:7px;margin-bottom:.75rem}
+.kpi{background:#fff;border-radius:var(--r);padding:.65rem .875rem;border:.5px solid var(--gb)}
+.kv{font-size:19px;font-weight:600;color:var(--blue)}
+.kv.r{color:var(--red)}.kv.a{color:var(--amber)}.kv.g{color:var(--green)}
+.kl{font-size:10.5px;color:var(--gm);margin-top:2px;line-height:1.3}
+.ajb{background:var(--blue-bg);border:1px solid var(--blue-lt);border-radius:var(--r);padding:.875rem 1.125rem;margin-bottom:.75rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}
+.ajn{font-size:28px;font-weight:700;color:var(--blue);white-space:nowrap}
+.ajt{font-size:12px;color:var(--gd);line-height:1.55;flex:1;min-width:200px}
+.fbar{background:#fff;border-radius:var(--r);padding:.5rem .875rem;margin-bottom:.625rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap;border:.5px solid var(--gb)}
+.fl{font-size:10.5px;font-weight:700;color:var(--gm);text-transform:uppercase;letter-spacing:.05em;margin-right:4px}
+.chip{font-size:11px;padding:3px 10px;border-radius:20px;border:1.5px solid transparent;cursor:pointer;background:var(--gl);color:var(--gd);transition:all .12s;font-weight:500;white-space:nowrap}
+.chip:hover{filter:brightness(.94)}
+.aC1{background:var(--red-lt)!important;border-color:var(--red)!important;color:var(--red)!important}
+.aC2{background:var(--amber-lt)!important;border-color:var(--amber)!important;color:var(--amber)!important}
+.aC3{background:var(--blue-bg)!important;border-color:var(--blue)!important;color:var(--blue)!important}
+.aC4{background:var(--green-lt)!important;border-color:var(--green)!important;color:var(--green)!important}
+.aC5{background:var(--purple-lt)!important;border-color:var(--purple)!important;color:var(--purple)!important}
+.aALL{background:var(--navy)!important;border-color:var(--navy)!important;color:#fff!important}
+.fhint{font-size:10.5px;color:var(--gm);margin-left:4px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:.875rem;margin-bottom:.875rem}
+.card{background:#fff;border-radius:var(--r);padding:.875rem 1rem;border:.5px solid var(--gb)}
+.card.full{grid-column:1/-1}
+.ct{font-size:12px;font-weight:600;color:var(--navy);margin-bottom:.5rem}
+.cs{font-size:10.5px;color:var(--gm);margin-bottom:.5rem}
+.clb{border-radius:var(--r);padding:.75rem 1rem;margin-bottom:.625rem;display:flex;gap:1.25rem;flex-wrap:wrap;align-items:center;border:1px solid}
+.cls{text-align:center;min-width:72px}
+.cls .v{font-size:16px;font-weight:700}
+.cls .l{font-size:9.5px;color:var(--gm);margin-top:1px}
+.cli{flex:1;min-width:200px}
+.clt{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;display:inline-block;margin-bottom:.3rem}
+.cltt{font-size:13px;font-weight:600;margin-bottom:.25rem}
+.clb2{font-size:11.5px;line-height:1.5;margin-bottom:.35rem}
+.cla{font-size:10.5px;padding:3px 9px;border-radius:10px;display:inline-block}
+.ctm{font-size:11.5px;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:.45rem .75rem;margin-bottom:.625rem;border-left:3px solid var(--blue)}
+.igs{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:.625rem;margin-bottom:.75rem}
+.ig{border-radius:var(--r);padding:.75rem;border-left:4px solid}
+.igb{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:10px;display:inline-block;margin-bottom:.3rem}
+.igt{font-size:12px;font-weight:600;margin-bottom:.2rem}
+.igd{font-size:11px;color:var(--gd);line-height:1.45;margin-bottom:.3rem}
+.iga{font-size:10px;padding:2px 7px;border-radius:10px;display:inline-block}
+.tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.tbl th{background:var(--navy);color:#fff;font-weight:600;padding:5px 7px;text-align:left;font-size:11px;white-space:nowrap}
+.tbl th.r{text-align:right}
+.tbl td{padding:5px 7px;border-bottom:.5px solid var(--gb);vertical-align:middle}
+.tbl td.r{text-align:right;font-variant-numeric:tabular-nums}
+.tbl tr:nth-child(even) td{background:var(--gl)}
+.tbl tr:hover td{background:#EEF4FB}
+.bdg{font-size:9.5px;padding:2px 6px;border-radius:9px;font-weight:600;white-space:nowrap;display:inline-block}
+.bm{height:5px;border-radius:3px;display:inline-block;vertical-align:middle;margin-right:4px}
+.v4tag{background:var(--navy);color:var(--blue-lt);font-size:10px;padding:2px 8px;border-radius:12px;font-weight:600}
+@media(max-width:680px){.g2{grid-template-columns:1fr}.ajn{font-size:22px}}
+
+.tabs{display:flex;gap:0;border-bottom:none}
+.tab-btn{padding:.6rem 1.25rem;font-size:12px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--gm);border-bottom:3px solid transparent;transition:all .15s;font-family:var(--font)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);background:var(--blue-bg)}
+.tab-btn:hover:not(.active){color:var(--gd);background:var(--gl)}
+.mod-nota{background:#FEF9EC;border-left:4px solid #C8961A;border-radius:0 var(--r) var(--r) 0;padding:.45rem .875rem;margin:.625rem 0;font-size:11px;color:#6B4C0B}
+.quad-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.875rem}
+.quad-card{border-radius:var(--r);padding:.875rem 1rem;border:1px solid}
+.quad-num{font-size:22px;font-weight:700;margin-bottom:2px}
+.quad-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.25rem}
+.quad-sub{font-size:11.5px;line-height:1.5;margin-top:.25rem}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div>
+    <div class="hdr-t">Subdeclaración de Peso — Análisis de Facturación </div>
+    <div class="hdr-s" id="hdr-s">Cargando…</div>
+  </div>
+  <div class="hdr-b" id="hdr-b"></div>
+</div>
+<div class="wrap">
+  <div class="nota"><strong>⚠ Nota metodológica:</strong> El daño se estima comparando el <em>intervalo tarifario aplicado</em> vs. el <em>intervalo tarifario deseado</em> según el peso real medido, usando la tarifa promedio por intervalo como proxy. Los valores son estimaciones sujetas a revisión con la tabla de tarifas exacta por contrato.</div>
+  <div class="sec">Métricas generales — 3 meses acumulados (mar–may 2026)</div>
+  <div class="kpis" id="kpis-row"></div>
+  <div class="ajb" id="ajb"></div>
+  <div class="fbar">
+    <span class="fl">Cluster:</span>
+    <button class="chip aALL" data-cl="ALL" onclick="tog('ALL',this)">Todos</button>
+    <button class="chip" data-cl="C1" onclick="tog('C1',this)">C1 – Alto riesgo concentrado</button>
+    <button class="chip" data-cl="C2" onclick="tog('C2',this)">C2 – Alto riesgo difuso</button>
+    <button class="chip" data-cl="C3" onclick="tog('C3',this)">C3 – Riesgo moderado</button>
+    <button class="chip" data-cl="C4" onclick="tog('C4',this)">C4 – Riesgo bajo</button>
+    <button class="chip" data-cl="C5" onclick="tog('C5',this)">C5 – Nos favorece</button>
+    <span class="fhint">Selección múltiple habilitada</span>
+  </div>
+  <div id="ctx"></div>
+  <div class="igs" id="igs"></div>
+  <div class="g2">
+    <div class="card"><div class="ct" id="t-cd">Daño estimado por cluster ()</div><div style="position:relative;height:210px"><canvas id="chCD"></canvas></div></div>
+    <div class="card"><div class="ct" id="t-ce">Distribución de envíos por cluster</div><div style="position:relative;height:210px"><canvas id="chCE"></canvas></div></div>
+  </div>
+  <div class="card full" style="margin-bottom:.875rem">
+    <div class="ct">Ajuste sugerido por intervalo de peso ($/envío) y daño total ()</div>
+    <div class="cs" id="cs-iv">Los tramos 0–2 kg generan daño mínimo. El daño escala fuertemente desde 3–5 kg. Tramos mayores muestran ajustes unitarios muy elevados.</div>
+    <div style="position:relative;height:260px"><canvas id="chIV"></canvas></div>
+  </div>
+  <div class="g2" style="margin-bottom:.875rem">
+    <div class="card"><div class="ct" id="t-ad">Daño estimado por actividad — top 12 ()</div><div style="position:relative;height:300px"><canvas id="chAD"></canvas></div></div>
+    <div class="card"><div class="ct">% de registros que subdeclaran por actividad</div><div style="position:relative;height:300px"><canvas id="chSD"></canvas></div></div>
+  </div>
+  <div class="g2" style="margin-bottom:.875rem">
+    <div class="card"><div class="ct" id="t-ac">Composición del daño por cluster dentro de actividades</div><div style="position:relative;height:300px"><canvas id="chAC"></canvas></div></div>
+    <div class="card"><div class="ct">Evolución mensual — daño () y % sobre facturación</div><div style="position:relative;height:300px"><canvas id="chME"></canvas></div></div>
+  </div>
+  <div class="card full" style="margin-bottom:.875rem">
+    <div class="ct">Daño estimado por clasificación de subdeclaración</div>
+    <div style="overflow-x:auto"><table class="tbl" id="tbl-cl"></table></div>
+  </div>
+  <div class="card full" style="margin-bottom:.875rem">
+    <div class="ct" id="t-ti">Ajuste sugerido por intervalo de peso — detalle (hasta 100 kg)</div>
+    <div style="overflow-x:auto"><table class="tbl" id="tbl-iv"></table></div>
+  </div>
+  <div class="card full" style="margin-bottom:.875rem">
+    <div class="ct" id="t-tc">Top 20 clientes por daño estimado</div>
+    <div style="overflow-x:auto"><table class="tbl" id="tbl-tc"></table></div>
+  </div>
+</div>
+<script>
+const D={"version":"v4_2026-06","kpis":{"envios_prom_mes":451438,"dano_total":5337094612,"dano_prom_mes":1779031537,"dano_pct_fact":29.4,"benef_total":742656222,"dano_neto":4594438390,"ajuste_unitario":3941,"pct_envios_con_dano":31.5,"pct_intv_difiere":51.1,"n_clientes":58707,"n_meses":3,"meses":["2026-03","2026-04","2026-05"],"nota_metodologia":"Daño estimado usando tarifa promedio por intervalo como proxy. Sujeto a revisión con tabla de tarifas exacta."},"by_month":[{"mes_str":"2026-03","envios":466765,"dano":1690417147.062022,"benef":272945959.55026674,"costo":5804883851.239669,"pct_fact":29.1,"ajuste":3622.0},{"mes_str":"2026-04","envios":413895,"dano":1876992108.62463,"benef":258446443.45349354,"costo":5741496446.504134,"pct_fact":32.7,"ajuste":4535.0},{"mes_str":"2026-05","envios":473654,"dano":1769685356.1951911,"benef":211263818.8679485,"costo":6600897082.983486,"pct_fact":26.8,"ajuste":3736.0}],"by_clasificacion":[{"clas":"Nos miente: dif.mayores a 30%","envios":635732,"dano":5115392595.520919,"benef":26180698.58363501,"dano_unit":8046.0,"pct_dano":95.8},{"clas":"Nos miente: dif.menores a 30%","envios":39133,"dano":98152797.18082114,"benef":7385197.202154425,"dano_unit":2508.0,"pct_dano":1.8},{"clas":"Nos miente: dif.menores a 20%","envios":37279,"dano":63767508.31656671,"benef":5376879.294218505,"dano_unit":1711.0,"pct_dano":1.2},{"clas":"Nos miente: dif.menores a 10%","envios":38277,"dano":32189570.455942076,"benef":7593203.586328958,"dano_unit":841.0,"pct_dano":0.6},{"clas":"Nos favorece","envios":273525,"dano":27525459.040916927,"benef":696120243.2053719,"dano_unit":101.0,"pct_dano":0.5},{"clas":"No declara kilos","envios":1622,"dano":66681.36667769126,"benef":0.0,"dano_unit":41.0,"pct_dano":0.0},{"clas":"No evaluado por sorter","envios":320920,"dano":0.0,"benef":0.0,"dano_unit":0.0,"pct_dano":0.0},{"clas":"Coinciden","envios":7826,"dano":0.0,"benef":0.0,"dano_unit":0.0,"pct_dano":0.0}],"clusters":[{"cluster":"C1","clientes":3218,"envios":846465,"dano":3893199309.3674216,"pct_miente_prom":0.7415207469374634,"dano_unit":4599.0,"pct_dano":72.9},{"cluster":"C2","clientes":15379,"envios":67542,"dano":594288230.4994136,"pct_miente_prom":0.919517508392778,"dano_unit":8799.0,"pct_dano":11.1},{"cluster":"C3","clientes":10708,"envios":296320,"dano":745325815.5114126,"pct_miente_prom":0.4620403889758248,"dano_unit":2515.0,"pct_dano":14.0},{"cluster":"C4","clientes":3591,"envios":74224,"dano":98836981.17053434,"pct_miente_prom":0.20654427333027578,"dano_unit":1332.0,"pct_dano":1.9},{"cluster":"C5","clientes":26577,"envios":69763,"dano":5444275.333061418,"pct_miente_prom":0.0,"dano_unit":78.0,"pct_dano":0.1}],"by_activity":[{"Actividad":"Indumentaria e Indumentaria deportiva","envios":238251,"dano":1040774846.6493642,"costo":2351110475.363636,"clientes":4911,"dano_pct_fact":44.3,"dano_unit":4368.0},{"Actividad":"sin actividad","envios":98409,"dano":495125932.2642996,"costo":2141186685.9338844,"clientes":25282,"dano_pct_fact":23.1,"dano_unit":5031.0},{"Actividad":"Bazar y/o Decoración","envios":98887,"dano":362280909.71591055,"costo":1035975130.2892537,"clientes":2296,"dano_pct_fact":35.0,"dano_unit":3664.0},{"Actividad":"Mueblería","envios":14321,"dano":353200639.79484236,"costo":747784925.7355373,"clientes":581,"dano_pct_fact":47.2,"dano_unit":24663.0},{"Actividad":"Electrodomésticos","envios":25426,"dano":346471972.25958836,"costo":913367994.1818182,"clientes":881,"dano_pct_fact":37.9,"dano_unit":13627.0},{"Actividad":"Textil","envios":69081,"dano":334898245.9332419,"costo":766695532.2975206,"clientes":1915,"dano_pct_fact":43.7,"dano_unit":4848.0},{"Actividad":"Accesorios y/o Marroquinería","envios":83382,"dano":258940158.27573448,"costo":879807312.6694214,"clientes":3041,"dano_pct_fact":29.4,"dano_unit":3105.0},{"Actividad":"Tecnología e Informática","envios":84349,"dano":252691104.92285216,"costo":915576931.9834709,"clientes":2582,"dano_pct_fact":27.6,"dano_unit":2996.0},{"Actividad":"Alimentos y/o Bebidas","envios":61266,"dano":182342089.6369982,"costo":987408613.7024794,"clientes":2159,"dano_pct_fact":18.5,"dano_unit":2976.0},{"Actividad":"Mascotas","envios":22800,"dano":177549166.61269742,"costo":202049362.38842976,"clientes":267,"dano_pct_fact":87.9,"dano_unit":7787.0},{"Actividad":"Cosmética y/o Perfumería","envios":214147,"dano":168488319.70386243,"costo":1878188872.0330763,"clientes":2151,"dano_pct_fact":9.0,"dano_unit":787.0},{"Actividad":"Artesanías y/o productos regionales","envios":40444,"dano":158531637.0016147,"costo":514404946.34710747,"clientes":1971,"dano_pct_fact":30.8,"dano_unit":3920.0}],"by_activity_cluster":[{"Actividad":"Accesorios y/o Marroquinería","cluster":"C1","dano":184649658.56946376,"envios":50944},{"Actividad":"Accesorios y/o Marroquinería","cluster":"C2","dano":39956933.82735057,"envios":5884},{"Actividad":"Accesorios y/o Marroquinería","cluster":"C3","dano":31115461.622985605,"envios":20228},{"Actividad":"Accesorios y/o Marroquinería","cluster":"C4","dano":3102817.953545149,"envios":3674},{"Actividad":"Accesorios y/o Marroquinería","cluster":"C5","dano":115286.30238939468,"envios":2652},{"Actividad":"Alimentos y/o Bebidas","cluster":"C1","dano":124454221.66285802,"envios":28768},{"Actividad":"Alimentos y/o Bebidas","cluster":"C2","dano":14601130.495010491,"envios":1979},{"Actividad":"Alimentos y/o Bebidas","cluster":"C3","dano":33809503.9469725,"envios":18124},{"Actividad":"Alimentos y/o Bebidas","cluster":"C4","dano":8138168.827965967,"envios":7310},{"Actividad":"Alimentos y/o Bebidas","cluster":"C5","dano":1339064.7041912198,"envios":5085},{"Actividad":"Artesanías y/o productos regionales","cluster":"C1","dano":115299689.11562563,"envios":20782},{"Actividad":"Artesanías y/o productos regionales","cluster":"C2","dano":16302769.39832409,"envios":3018},{"Actividad":"Artesanías y/o productos regionales","cluster":"C3","dano":23100489.760694753,"envios":12907},{"Actividad":"Artesanías y/o productos regionales","cluster":"C4","dano":3168367.646497442,"envios":2257},{"Actividad":"Artesanías y/o productos regionales","cluster":"C5","dano":660321.0804727711,"envios":1480},{"Actividad":"Bazar y/o Decoración","cluster":"C1","dano":288100907.8989183,"envios":76601},{"Actividad":"Bazar y/o Decoración","cluster":"C2","dano":32627333.576027192,"envios":4458},{"Actividad":"Bazar y/o Decoración","cluster":"C3","dano":38912605.80103795,"envios":11398},{"Actividad":"Bazar y/o Decoración","cluster":"C4","dano":2232889.903166797,"envios":3151},{"Actividad":"Bazar y/o Decoración","cluster":"C5","dano":407172.53676031675,"envios":3279},{"Actividad":"Cosmética y/o Perfumería","cluster":"C1","dano":133858892.46802546,"envios":172892},{"Actividad":"Cosmética y/o Perfumería","cluster":"C2","dano":8453299.888016384,"envios":3631},{"Actividad":"Cosmética y/o Perfumería","cluster":"C3","dano":22815307.83497344,"envios":28438},{"Actividad":"Cosmética y/o Perfumería","cluster":"C4","dano":1325702.447955334,"envios":6955},{"Actividad":"Cosmética y/o Perfumería","cluster":"C5","dano":2035117.0648918017,"envios":2231},{"Actividad":"Electrodomésticos","cluster":"C1","dano":216156228.40295166,"envios":12862},{"Actividad":"Electrodomésticos","cluster":"C2","dano":37222624.474541344,"envios":1284},{"Actividad":"Electrodomésticos","cluster":"C3","dano":81361650.98616092,"envios":8646},{"Actividad":"Electrodomésticos","cluster":"C4","dano":10680532.382901778,"envios":1657},{"Actividad":"Electrodomésticos","cluster":"C5","dano":1050936.0130326774,"envios":977},{"Actividad":"Indumentaria e Indumentaria deportiva","cluster":"C1","dano":868195723.1398447,"envios":178001},{"Actividad":"Indumentaria e Indumentaria deportiva","cluster":"C2","dano":96054963.90619428,"envios":11311},{"Actividad":"Indumentaria e Indumentaria deportiva","cluster":"C3","dano":68582149.8572724,"envios":38651},{"Actividad":"Indumentaria e Indumentaria deportiva","cluster":"C4","dano":3540231.4932312886,"envios":4320},{"Actividad":"Indumentaria e Indumentaria deportiva","cluster":"C5","dano":4401778.252821573,"envios":5968},{"Actividad":"Mascotas","cluster":"C1","dano":170566675.34173685,"envios":19525},{"Actividad":"Mascotas","cluster":"C2","dano":3279087.3957521357,"envios":492},{"Actividad":"Mascotas","cluster":"C3","dano":3321702.4838164407,"envios":2384},{"Actividad":"Mascotas","cluster":"C4","dano":336020.03015487,"envios":204},{"Actividad":"Mascotas","cluster":"C5","dano":45681.36123714222,"envios":195},{"Actividad":"Mueblería","cluster":"C1","dano":272436159.3343843,"envios":7855},{"Actividad":"Mueblería","cluster":"C2","dano":40574974.849106796,"envios":781},{"Actividad":"Mueblería","cluster":"C3","dano":36224353.591202095,"envios":3992},{"Actividad":"Mueblería","cluster":"C4","dano":3331059.7070797924,"envios":1143},{"Actividad":"Mueblería","cluster":"C5","dano":634092.3130693682,"envios":550},{"Actividad":"Tecnología e Informática","cluster":"C1","dano":143785219.27542675,"envios":41174},{"Actividad":"Tecnología e Informática","cluster":"C2","dano":73983349.88947612,"envios":15239},{"Actividad":"Tecnología e Informática","cluster":"C3","dano":31125505.56870436,"envios":19767},{"Actividad":"Tecnología e Informática","cluster":"C4","dano":3587873.0524726617,"envios":4821},{"Actividad":"Tecnología e Informática","cluster":"C5","dano":209157.13677227058,"envios":3348},{"Actividad":"Textil","cluster":"C1","dano":291614351.7034798,"envios":51320},{"Actividad":"Textil","cluster":"C2","dano":20115622.423943184,"envios":4246},{"Actividad":"Textil","cluster":"C3","dano":20823422.176209915,"envios":10420},{"Actividad":"Textil","cluster":"C4","dano":2176045.0611807075,"envios":1583},{"Actividad":"Textil","cluster":"C5","dano":168804.5684283169,"envios":1512},{"Actividad":"sin actividad","cluster":"C1","dano":162225171.65167066,"envios":16689},{"Actividad":"sin actividad","cluster":"C2","dano":179172288.05100286,"envios":15256},{"Actividad":"sin actividad","cluster":"C3","dano":129717108.18537126,"envios":27531},{"Actividad":"sin actividad","cluster":"C4","dano":20492653.955222882,"envios":10675},{"Actividad":"sin actividad","cluster":"C5","dano":3518710.4210319025,"envios":28258}],"act_subdecl":[{"Actividad":"Indumentaria e Indumentaria deportiva","pct_miente":63.9,"envios":238251,"vd_prom":114231.6417189173},{"Actividad":"Cosmética y/o Perfumería","pct_miente":54.7,"envios":214147,"vd_prom":98847.60557113733},{"Actividad":"Bazar y/o Decoración","pct_miente":58.2,"envios":98887,"vd_prom":113635.17939960485},{"Actividad":"sin actividad","pct_miente":36.5,"envios":98409,"vd_prom":180771.45963215164},{"Actividad":"Tecnología e Informática","pct_miente":50.1,"envios":84349,"vd_prom":231908.43163125124},{"Actividad":"Accesorios y/o Marroquinería","pct_miente":57.7,"envios":83382,"vd_prom":101882.63323599528},{"Actividad":"Textil","pct_miente":62.7,"envios":69081,"vd_prom":94608.48680087067},{"Actividad":"Alimentos y/o Bebidas","pct_miente":45.9,"envios":61266,"vd_prom":205642.2860315676},{"Actividad":"Artesanías y/o productos regionales","pct_miente":55.0,"envios":40444,"vd_prom":147729.55308407662},{"Actividad":"Artículos deportivos","pct_miente":52.0,"envios":39237,"vd_prom":168500.5130421408},{"Actividad":"Salud","pct_miente":53.5,"envios":36336,"vd_prom":132187.81412189585},{"Actividad":"Calzado","pct_miente":62.5,"envios":34391,"vd_prom":112527.08041711758},{"Actividad":"Autopartes","pct_miente":43.3,"envios":28743,"vd_prom":223146.32926484925},{"Actividad":"Librería y/o Artística","pct_miente":49.1,"envios":25490,"vd_prom":89898.50034087895},{"Actividad":"Electrodomésticos","pct_miente":52.3,"envios":25426,"vd_prom":331976.6290873077}],"top_clients":[{"des_usuario":"LOGISTICA REALES","Actividad":"Indumentaria e Indumentaria deportiva","cluster":"C1","envios":7925,"dano":160758096.0,"pct_miente":0.772,"dano_unit":20285.0},{"des_usuario":"PULGUITAS S.R.L","Actividad":"Mascotas","cluster":"C1","envios":1891,"dano":115766448.0,"pct_miente":0.835,"dano_unit":61220.0},{"des_usuario":"MYM NET S.A.","Actividad":"Electrodomésticos","cluster":"C1","envios":2587,"dano":101838758.0,"pct_miente":0.745,"dano_unit":39366.0},{"des_usuario":"EOWOL S.A. EOWOL S.A.","Actividad":"Metalúrgica","cluster":"C1","envios":2183,"dano":75293332.0,"pct_miente":0.725,"dano_unit":34491.0},{"des_usuario":"ONLINE SHOP","Actividad":"Tecnología e Informática","cluster":"C1","envios":12334,"dano":59694780.0,"pct_miente":0.775,"dano_unit":4840.0},{"des_usuario":"CM LOGISTICA","Actividad":"Indumentaria e Indumentaria deportiva","cluster":"C1","envios":2599,"dano":56372175.0,"pct_miente":0.833,"dano_unit":21690.0},{"des_usuario":"MOBAPP  LOGÍSTICA INTELIGENTE","Actividad":"Tecnología e Informática","cluster":"C1","envios":2468,"dano":45145223.0,"pct_miente":0.822,"dano_unit":18292.0},{"des_usuario":"MOBAPP EXPRESS","Actividad":"Profesional y/o Jurídico","cluster":"C1","envios":2553,"dano":41176215.0,"pct_miente":0.831,"dano_unit":16129.0},{"des_usuario":"EVER PAULINO GUTIERRES ALARCON","Actividad":"Blanquería","cluster":"C1","envios":136,"dano":36210832.0,"pct_miente":0.762,"dano_unit":266256.0},{"des_usuario":"ANGUIE MARCELA QUINTERO DIAZ","Actividad":"Mascotas","cluster":"C1","envios":595,"dano":34179913.0,"pct_miente":0.655,"dano_unit":57445.0},{"des_usuario":"MENDOZA TEXTIL LIVING","Actividad":"Mueblería","cluster":"C1","envios":243,"dano":30317778.0,"pct_miente":0.869,"dano_unit":124765.0},{"des_usuario":"LUPE HOME","Actividad":"Mueblería","cluster":"C1","envios":224,"dano":28195774.0,"pct_miente":0.871,"dano_unit":125874.0},{"des_usuario":"IVAN ALFREDO MENDOZA","Actividad":"sin actividad","cluster":"C1","envios":128,"dano":26240326.0,"pct_miente":0.825,"dano_unit":205003.0},{"des_usuario":"TIENDA NUBE","Actividad":"Indumentaria e Indumentaria deportiva","cluster":"C1","envios":1276,"dano":25380080.0,"pct_miente":0.8,"dano_unit":19890.0},{"des_usuario":"SEBASTIAN TORRESI","Actividad":"Construcción","cluster":"C1","envios":246,"dano":25120478.0,"pct_miente":0.905,"dano_unit":102116.0},{"des_usuario":"MILAGROS ORIANA GOMEZ","Actividad":"Mueblería","cluster":"C1","envios":316,"dano":23446735.0,"pct_miente":0.738,"dano_unit":74199.0},{"des_usuario":"DORMI ONLINE","Actividad":"Mueblería","cluster":"C1","envios":406,"dano":21981775.0,"pct_miente":0.713,"dano_unit":54142.0},{"des_usuario":"ANGUITA PAMELA","Actividad":"Accesorios y/o Marroquinería","cluster":"C1","envios":1447,"dano":21115489.0,"pct_miente":0.857,"dano_unit":14593.0},{"des_usuario":"ESPOSITO ROMINA","Actividad":"Calzado","cluster":"C1","envios":2597,"dano":20863528.0,"pct_miente":0.771,"dano_unit":8034.0},{"des_usuario":"LABORATORIO 3D","Actividad":"Bazar y/o Decoración","cluster":"C1","envios":1490,"dano":20748340.0,"pct_miente":0.633,"dano_unit":13925.0}],"by_interval":[{"intv_deseado":"0 - 500","envios":460584,"dano":4316398.461517407,"dano_unit":9.0,"pct_dano":0.1},{"intv_deseado":"501 - 1000","envios":4856,"dano":0.0,"dano_unit":0.0,"pct_dano":0.0},{"intv_deseado":"1001 - 2000","envios":239929,"dano":1733580.0604613405,"dano_unit":7.0,"pct_dano":0.0},{"intv_deseado":"2001 - 3000","envios":157556,"dano":101494210.99542281,"dano_unit":644.0,"pct_dano":1.9},{"intv_deseado":"3001 - 5000","envios":151863,"dano":434494982.3182782,"dano_unit":2861.0,"pct_dano":8.1},{"intv_deseado":"5001 - 10000","envios":162201,"dano":853140821.9278258,"dano_unit":5260.0,"pct_dano":16.0},{"intv_deseado":"10001 - 15000","envios":51128,"dano":559649656.4228891,"dano_unit":10946.0,"pct_dano":10.5},{"intv_deseado":"15001 - 20000","envios":29180,"dano":380054434.32503587,"dano_unit":13024.0,"pct_dano":7.1},{"intv_deseado":"20001 - 35000","envios":45929,"dano":411156610.20437,"dano_unit":8952.0,"pct_dano":7.7},{"intv_deseado":"35001 - 50000","envios":12882,"dano":384881098.2048704,"dano_unit":29877.0,"pct_dano":7.2},{"intv_deseado":"50001 - 100000","envios":13086,"dano":476716826.9447323,"dano_unit":36430.0,"pct_dano":8.9},{"intv_deseado":"100001 - 200000","envios":6858,"dano":281917258.7266295,"dano_unit":41108.0,"pct_dano":5.3},{"intv_deseado":"200001 - 300000","envios":3868,"dano":219684319.46694335,"dano_unit":56795.0,"pct_dano":4.1},{"intv_deseado":"300001 - 400000","envios":2613,"dano":140981134.7548717,"dano_unit":53954.0,"pct_dano":2.6},{"intv_deseado":"400001 - 500000","envios":2022,"dano":133288154.3582755,"dano_unit":65919.0,"pct_dano":2.5},{"intv_deseado":"500001 - 600000","envios":1967,"dano":111750964.91393533,"dano_unit":56813.0,"pct_dano":2.1},{"intv_deseado":"600001 - 700000","envios":1846,"dano":86705428.77573788,"dano_unit":46969.0,"pct_dano":1.6},{"intv_deseado":"700001 - 800000","envios":1661,"dano":38753320.16045659,"dano_unit":23331.0,"pct_dano":0.7},{"intv_deseado":"800001 - 900000","envios":763,"dano":50641962.94075971,"dano_unit":66372.0,"pct_dano":0.9},{"intv_deseado":"900001 - 1000000","envios":544,"dano":49982745.29907033,"dano_unit":91880.0,"pct_dano":0.9},{"intv_deseado":"1000001 - 1100000","envios":637,"dano":80437958.07722479,"dano_unit":126276.0,"pct_dano":1.5},{"intv_deseado":"1100001 - 1200000","envios":334,"dano":68473442.53466897,"dano_unit":205010.0,"pct_dano":1.3},{"intv_deseado":"1200001 - 1300000","envios":363,"dano":71787319.07984713,"dano_unit":197761.0,"pct_dano":1.3},{"intv_deseado":"1300001 - 1400000","envios":283,"dano":72204168.13252507,"dano_unit":255138.0,"pct_dano":1.4},{"intv_deseado":"1400001 - 1500000","envios":163,"dano":35961023.41907675,"dano_unit":220620.0,"pct_dano":0.7},{"intv_deseado":"1500001 - 1600000","envios":208,"dano":54261195.52335959,"dano_unit":260871.0,"pct_dano":1.0},{"intv_deseado":"1700001 - 1800000","envios":118,"dano":31992112.972988304,"dano_unit":271120.0,"pct_dano":0.6},{"intv_deseado":"2000001 - 2100000","envios":118,"dano":51587871.30457699,"dano_unit":437185.0,"pct_dano":1.0},{"intv_deseado":"2200001 - 2300000","envios":96,"dano":42944489.14075577,"dano_unit":447338.0,"pct_dano":0.8}],"by_interval_cluster":[{"intv_deseado":"0 - 500","cluster":"C1","envios":315150,"dano":1507340.498011255},{"intv_deseado":"0 - 500","cluster":"C2","envios":17716,"dano":156055.00739144933},{"intv_deseado":"0 - 500","cluster":"C3","envios":89706,"dano":1819951.179163851},{"intv_deseado":"0 - 500","cluster":"C4","envios":18011,"dano":584526.9915891616},{"intv_deseado":"0 - 500","cluster":"C5","envios":20001,"dano":248524.78536168946},{"intv_deseado":"501 - 1000","cluster":"C5","envios":131,"dano":0.0},{"intv_deseado":"501 - 1000","cluster":"C4","envios":238,"dano":0.0},{"intv_deseado":"501 - 1000","cluster":"C1","envios":2806,"dano":0.0},{"intv_deseado":"501 - 1000","cluster":"C3","envios":1571,"dano":0.0},{"intv_deseado":"501 - 1000","cluster":"C2","envios":110,"dano":0.0},{"intv_deseado":"1001 - 2000","cluster":"C2","envios":14845,"dano":177460.86162122077},{"intv_deseado":"1001 - 2000","cluster":"C1","envios":151787,"dano":1079100.4482426879},{"intv_deseado":"1001 - 2000","cluster":"C5","envios":8096,"dano":0.0},{"intv_deseado":"1001 - 2000","cluster":"C3","envios":55244,"dano":450325.4733619279},{"intv_deseado":"1001 - 2000","cluster":"C4","envios":9957,"dano":26693.27723550396},{"intv_deseado":"2001 - 3000","cluster":"C2","envios":10560,"dano":8039424.512592053},{"intv_deseado":"2001 - 3000","cluster":"C4","envios":6459,"dano":757007.7645361496},{"intv_deseado":"2001 - 3000","cluster":"C1","envios":101566,"dano":78591554.48703064},{"intv_deseado":"2001 - 3000","cluster":"C3","envios":33817,"dano":13826629.513365177},{"intv_deseado":"2001 - 3000","cluster":"C5","envios":5154,"dano":279594.71789879573},{"intv_deseado":"3001 - 5000","cluster":"C2","envios":11048,"dano":39475149.69837074},{"intv_deseado":"3001 - 5000","cluster":"C4","envios":9237,"dano":2833075.0901687834},{"intv_deseado":"3001 - 5000","cluster":"C5","envios":8596,"dano":1229497.0253963938},{"intv_deseado":"3001 - 5000","cluster":"C1","envios":88857,"dano":339216835.85839355},{"intv_deseado":"3001 - 5000","cluster":"C3","envios":34125,"dano":51740424.645948745},{"intv_deseado":"5001 - 10000","cluster":"C2","envios":12245,"dano":89132844.18958224},{"intv_deseado":"5001 - 10000","cluster":"C3","envios":38743,"dano":80296202.73848832},{"intv_deseado":"5001 - 10000","cluster":"C1","envios":83762,"dano":675476411.0987023},{"intv_deseado":"5001 - 10000","cluster":"C5","envios":14218,"dano":2403346.4499482526},{"intv_deseado":"5001 - 10000","cluster":"C4","envios":13233,"dano":5832017.451104689},{"intv_deseado":"10001 - 15000","cluster":"C3","envios":12479,"dano":61089043.07378734},{"intv_deseado":"10001 - 15000","cluster":"C4","envios":4049,"dano":6266386.658565331},{"intv_deseado":"10001 - 15000","cluster":"C1","envios":27477,"dano":424698208.4267188},{"intv_deseado":"10001 - 15000","cluster":"C2","envios":5247,"dano":66244445.14002671},{"intv_deseado":"10001 - 15000","cluster":"C5","envios":1876,"dano":1351573.1237910301},{"intv_deseado":"15001 - 20000","cluster":"C2","envios":2771,"dano":47078994.211021475},{"intv_deseado":"15001 - 20000","cluster":"C1","envios":13413,"dano":281593701.24002135},{"intv_deseado":"15001 - 20000","cluster":"C4","envios":3031,"dano":4941752.133240601},{"intv_deseado":"15001 - 20000","cluster":"C3","envios":7428,"dano":45139758.75726305},{"intv_deseado":"15001 - 20000","cluster":"C5","envios":2537,"dano":1300227.9834893981},{"intv_deseado":"20001 - 35000","cluster":"C1","envios":18055,"dano":318459483.90989006},{"intv_deseado":"20001 - 35000","cluster":"C3","envios":9507,"dano":43229778.32793563},{"intv_deseado":"20001 - 35000","cluster":"C2","envios":3796,"dano":44983551.53083113},{"intv_deseado":"20001 - 35000","cluster":"C4","envios":4647,"dano":3896588.6947070966},{"intv_deseado":"20001 - 35000","cluster":"C5","envios":9924,"dano":587207.7410061122},{"intv_deseado":"35001 - 50000","cluster":"C4","envios":1093,"dano":5115833.086265551},{"intv_deseado":"35001 - 50000","cluster":"C5","envios":1393,"dano":745218.0172915376},{"intv_deseado":"35001 - 50000","cluster":"C3","envios":3062,"dano":55189849.21687017},{"intv_deseado":"35001 - 50000","cluster":"C1","envios":6165,"dano":279252525.1549085},{"intv_deseado":"35001 - 50000","cluster":"C2","envios":1169,"dano":44577672.72953464},{"intv_deseado":"50001 - 100000","cluster":"C3","envios":3191,"dano":67325621.42930834},{"intv_deseado":"50001 - 100000","cluster":"C5","envios":523,"dano":735973.4747971946},{"intv_deseado":"50001 - 100000","cluster":"C2","envios":1063,"dano":45215169.23072915},{"intv_deseado":"50001 - 100000","cluster":"C1","envios":7383,"dano":356044414.5892874},{"intv_deseado":"50001 - 100000","cluster":"C4","envios":926,"dano":7395648.220610166},{"intv_deseado":"100001 - 200000","cluster":"C4","envios":569,"dano":6838264.203958114},{"intv_deseado":"100001 - 200000","cluster":"C2","envios":620,"dano":28691874.47325271},{"intv_deseado":"100001 - 200000","cluster":"C3","envios":2169,"dano":49146149.46228567},{"intv_deseado":"100001 - 200000","cluster":"C1","envios":3216,"dano":196718389.89945528},{"intv_deseado":"100001 - 200000","cluster":"C5","envios":284,"dano":522580.6876777359}],"tarifa_por_intervalo":[{"intv_aplicado":"0 - 500","tarifa_unit":7771.187902708539,"envios_total":752327},{"intv_aplicado":"Peso a revisar","tarifa_unit":1569636.6328217238,"envios_total":14},{"intv_aplicado":"501 - 1000","tarifa_unit":7204.5202628095185,"envios_total":24834},{"intv_aplicado":"1001 - 2000","tarifa_unit":7698.840211615147,"envios_total":160505},{"intv_aplicado":"2001 - 3000","tarifa_unit":8698.786362490815,"envios_total":105691},{"intv_aplicado":"3001 - 5000","tarifa_unit":12467.955883764329,"envios_total":82150},{"intv_aplicado":"5001 - 10000","tarifa_unit":18515.75557353498,"envios_total":125069},{"intv_aplicado":"10001 - 15000","tarifa_unit":27627.691061687296,"envios_total":22281},{"intv_aplicado":"15001 - 20000","tarifa_unit":35986.21018447106,"envios_total":19888},{"intv_aplicado":"20001 - 35000","tarifa_unit":33391.20341561305,"envios_total":28083},{"intv_aplicado":"35001 - 50000","tarifa_unit":65687.63396415857,"envios_total":6799},{"intv_aplicado":"50001 - 100000","tarifa_unit":83530.57706742112,"envios_total":8705},{"intv_aplicado":"100001 - 200000","tarifa_unit":121630.0252083814,"envios_total":6771}]}
+;
+const CC={C1:'#A32D2D',C2:'#854F0B',C3:'#185FA5',C4:'#3B6D11',C5:'#534AB7'};
+const CL={C1:'#FCEBEB',C2:'#FAEEDA',C3:'#E6F1FB',C4:'#EAF3DE',C5:'#EEEDFE'};
+const CN={
+  C1:{l:'Alto riesgo concentrado',d:'3.218 clientes con >60% de registros que subdeclaran y alto volumen. 74% promedio de subdeclaración. Patrón sistemático y repetido — no aleatorio.',a:'Auditoría individual · Alerta de cuenta · Renegociación contractual'},
+  C2:{l:'Alto riesgo difuso',d:'15.379 clientes con >60% de registros que subdeclaran pero bajo volumen individual (.799/envío). Masivo y atomizado.',a:'Alerta automática · UX mejorada en plataforma · Campaña educativa'},
+  C3:{l:'Riesgo moderado',d:'10.708 clientes con 30–60% de registros que subdeclaran (.515/envío). Zona gris: puede ser descuido o intencional.',a:'Monitoreo mensual · Alerta preventiva por desvío acumulado'},
+  C4:{l:'Riesgo bajo',d:'3.591 clientes con menos del 30% de registros que subdeclaran. Comportamiento mayormente correcto.',a:'Sin acción inmediata · Usar como grupo control'},
+  C5:{l:'Nos favorece — sin urgencia',d:'26.577 clientes donde los registros clasifican favorablemente. No generan daño urgente en esta etapa de análisis.',a:'Monitoreo preventivo · Análisis de causa si escala'}
+};
+const INTV=['0 - 500','501 - 1000','1001 - 2000','2001 - 3000','3001 - 5000','5001 - 10000','10001 - 15000','15001 - 20000','20001 - 35000','35001 - 50000','50001 - 100000','100001 - 200000'];
+const ACTS=D.by_activity.map(r=>r.Actividad);
+let sel=new Set(['ALL']),CH={};
+const isAll=()=>sel.has('ALL');
+const active=()=>isAll()?['C1','C2','C3','C4','C5']:[...sel].filter(x=>x!=='ALL');
+const fM=v=>v<0?'-$'+Math.abs(v/1e6).toFixed(1)+'M':'$'+(v/1e6).toFixed(1)+'M';
+const fN=v=>Math.round(v).toLocaleString('es-AR');
+const dst=id=>{if(CH[id]){CH[id].destroy();delete CH[id];}};
+document.getElementById('hdr-s').textContent='Análisis de subdeclaración · '+fN(D.kpis.n_clientes)+' clientes · '+D.kpis.n_meses+' meses acumulados';
+document.getElementById('hdr-b').innerHTML='Período: <span>'+D.kpis.meses.join(' – ')+'</span>';
+document.getElementById('kpis-row').innerHTML=[
+  {v:fN(D.kpis.envios_prom_mes),l:'Envíos / mes promedio',c:''},
+  {v:fM(D.kpis.dano_prom_mes),l:'Daño estimado / mes',c:'r'},
+  {v:D.kpis.dano_pct_fact+'%',l:'% sobre facturación',c:'r'},
+  {v:D.kpis.pct_envios_con_dano+'%',l:'Envíos con daño',c:'a'},
+  {v:D.kpis.pct_intv_difiere+'%',l:'Intervalo declarado ≠ correcto',c:'a'},
+  {v:fN(D.kpis.n_clientes),l:'Clientes únicos',c:''},
+].map(k=>'<div class="kpi"><div class="kv '+k.c+'">'+k.v+'</div><div class="kl">'+k.l+'</div></div>').join('');
+document.getElementById('ajb').innerHTML='<div style="text-align:center;min-width:110px"><div style="font-size:11px;color:var(--gm);margin-bottom:2px">Ajuste unitario global</div><div class="ajn">$'+fN(D.kpis.ajuste_unitario)+'</div><div style="font-size:10px;color:var(--gm)">por envío (estimado)</div></div><div class="ajt"><strong>Aplicado a todos los envíos cubre el daño total estimado.</strong><br>La estructura varía fuertemente por intervalo de peso: 0–2 kg generan daño mínimo, mientras que desde 3–5 kg el ajuste necesario escala en forma exponencial — llegando a <strong>$29.877/envío</strong> en el tramo 35–50 kg y <strong>$36.430</strong> en 50–100 kg. Se recomienda estructura diferenciada por tramo.<br><span style="color:#C8961A;font-size:10.5px">⚠ Estimación con tarifa promedio como proxy — revisar con tarifas exactas.</span></div>';
+function tog(cl,btn){
+  if(cl==='ALL'){sel.clear();sel.add('ALL');}
+  else{sel.delete('ALL');sel.has(cl)?sel.delete(cl):sel.add(cl);if(sel.size===0)sel.add('ALL');}
+  document.querySelectorAll('.chip').forEach(c=>{c.className='chip';if(sel.has(c.dataset.cl)||(c.dataset.cl==='ALL'&&sel.has('ALL')))c.classList.add('a'+c.dataset.cl);});
+  renderAll();
+}
+function renderCtx(){
+  const cls=active(),ctx=document.getElementById('ctx');
+  if(isAll()){ctx.innerHTML='';return;}
+  if(cls.length===1){
+    const cl=cls[0],info=CN[cl],cd=D.clusters.find(c=>c.cluster===cl);
+    ctx.innerHTML='<div class="clb" style="background:'+CL[cl]+';border-color:'+CC[cl]+'40"><div class="cli"><div class="clt" style="background:'+CC[cl]+';color:#fff">'+cl+' — '+info.l.toUpperCase()+'</div><div class="cltt">'+info.d.split('.')[0]+'.</div><div class="clb2">'+info.d.split('.').slice(1).join('.').trim()+'</div><div class="cla" style="background:'+CC[cl]+'22;color:'+CC[cl]+'">→ '+info.a+'</div></div>'+[
+      ['$'+fN(cd.clientes),'Clientes'],[fN(cd.envios),'Envíos'],[fM(cd.dano),'Daño est.'],
+      ['$'+fN(cd.dano_unit),'$/envío'],[cd.pct_dano+'%','% total'],[Math.round(cd.pct_miente_prom*100)+'%','% subdecl.']
+    ].map(([v,l])=>'<div class="cls"><div class="v" style="color:'+CC[cl]+'">'+v.replace('620','$')+'</div><div class="l">'+l+'</div></div>').join('')+'</div>';
+  } else {
+    ctx.innerHTML='<div class="ctm">Vista filtrada para clusters: '+cls.map(c=>'<span style="color:'+CC[c]+';font-weight:600">'+c+'</span>').join(' + ')+'</div>';
+  }
+}
+function renderIgs(){
+  const cls=isAll()?['C1','C2','C3','C4','C5']:active();
+  document.getElementById('igs').innerHTML=cls.map(cl=>{
+    const i=CN[cl];
+    return '<div class="ig" style="background:'+CL[cl]+';border-color:'+CC[cl]+'"><div class="igb" style="background:'+CC[cl]+';color:#fff">'+cl+' · '+i.l+'</div><div class="igt">'+i.d.split('.')[0]+'.</div><div class="igd">'+i.d.split('.').slice(1).join('.').trim()+'</div><div class="iga" style="background:'+CC[cl]+'22;color:'+CC[cl]+'">→ '+i.a+'</div></div>';
+  }).join('');
+}
+function renderCD(){
+  dst('chCD');
+  const data=D.clusters.filter(c=>active().includes(c.cluster));
+  CH['chCD']=new Chart(document.getElementById('chCD'),{type:'bar',
+    data:{labels:data.map(c=>c.cluster),datasets:[{data:data.map(c=>+(c.dano/1e6).toFixed(1)),backgroundColor:data.map(c=>CC[c.cluster]),borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fM(c.raw*1e6)}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{ticks:{callback:v=>'$'+v+'M',font:{size:9}},grid:{color:'rgba(0,0,0,.05)'}}}}});
+}
+function renderCE(){
+  dst('chCE');
+  const cls=active();
+  if(cls.length===1){
+    const cl=cls[0],rows=D.by_interval_cluster.filter(r=>r.cluster===cl);
+    const labs=INTV.filter(i=>rows.find(r=>r.intv_deseado===i));
+    CH['chCE']=new Chart(document.getElementById('chCE'),{type:'bar',
+      data:{labels:labs,datasets:[{label:'Envíos',data:labs.map(i=>{const r=rows.find(x=>x.intv_deseado===i);return r?r.envios:0;}),backgroundColor:CC[cl]+'BB',borderRadius:3}]},
+      options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fN(c.raw)+' envíos'}}},
+        scales:{x:{ticks:{font:{size:9}},grid:{color:'rgba(0,0,0,.05)'}},y:{ticks:{font:{size:9}},grid:{display:false}}}}});
+    document.getElementById('t-ce').textContent='Envíos por intervalo de peso — '+cl;
+  } else {
+    const data=D.clusters.filter(c=>cls.includes(c.cluster));
+    CH['chCE']=new Chart(document.getElementById('chCE'),{type:'doughnut',
+      data:{labels:data.map(c=>c.cluster),datasets:[{data:data.map(c=>c.envios),backgroundColor:data.map(c=>CC[c.cluster]),borderWidth:2,borderColor:'#fff'}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}},
+        tooltip:{callbacks:{label:c=>' '+fN(c.raw)+' envíos'}}}}});
+    document.getElementById('t-ce').textContent='Distribución de envíos por cluster';
+  }
+}
+function renderIV(){
+  dst('chIV');
+  const cls=active(),byI={};
+  INTV.forEach(i=>byI[i]={dano:0,envios:0});
+  if(isAll()){D.by_interval.forEach(r=>{if(INTV.includes(r.intv_deseado))byI[r.intv_deseado]={dano:r.dano,envios:r.envios};});}
+  else{D.by_interval_cluster.filter(r=>cls.includes(r.cluster)).forEach(r=>{if(byI[r.intv_deseado]){byI[r.intv_deseado].dano+=r.dano;byI[r.intv_deseado].envios+=r.envios;}});}
+  const labs=INTV,aj=labs.map(i=>byI[i].envios>0?Math.round(byI[i].dano/byI[i].envios):0);
+  const dn=labs.map(i=>+(byI[i].dano/1e6).toFixed(1));
+  const bc=aj.map(v=>v<=0?'rgba(59,109,17,.65)':v<1000?'rgba(136,135,128,.5)':v<10000?'rgba(24,95,165,.8)':'rgba(163,45,45,.85)');
+  CH['chIV']=new Chart(document.getElementById('chIV'),{type:'bar',
+    data:{labels:labs,datasets:[
+      {label:'Ajuste $/envío',data:aj,backgroundColor:bc,borderRadius:4,yAxisID:'y'},
+      {type:'line',label:'Daño total ()',data:dn,borderColor:'#BA7517',backgroundColor:'#BA751722',pointBackgroundColor:'#BA7517',pointRadius:4,tension:.3,yAxisID:'y2'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{font:{size:10},padding:10}},
+        tooltip:{callbacks:{label:c=>c.datasetIndex===0?' $'+fN(c.raw)+'/envío':' '+fM(c.raw*1e6)+' daño'}}},
+      scales:{x:{grid:{display:false},ticks:{autoSkip:false,maxRotation:35,font:{size:9}}},
+        y:{position:'left',ticks:{callback:v=>'$'+fN(v),font:{size:9}},grid:{color:'rgba(0,0,0,.05)'},title:{display:true,text:'$/envío',font:{size:9},color:'#185FA5'}},
+        y2:{position:'right',ticks:{callback:v=>v+'M',font:{size:9}},grid:{display:false},title:{display:true,text:'Daño ',font:{size:9},color:'#BA7517'}}}}});
+}
+function renderAD(){
+  dst('chAD');
+  const cls=active(),ad={};ACTS.forEach(a=>ad[a]=0);
+  if(isAll()){D.by_activity.forEach(r=>ad[r.Actividad]=r.dano);}
+  else{D.by_activity_cluster.filter(r=>cls.includes(r.cluster)&&ad[r.Actividad]!==undefined).forEach(r=>ad[r.Actividad]+=r.dano);}
+  const sorted=[...ACTS].map(a=>({a,v:ad[a]})).sort((x,y)=>y.v-x.v);
+  const labs=sorted.map(r=>r.a.length>22?r.a.slice(0,20)+'…':r.a);
+  const vals=sorted.map(r=>+(r.v/1e6).toFixed(1));
+  const cols=vals.map(v=>v>400?'rgba(163,45,45,.85)':v>150?'rgba(24,95,165,.8)':'rgba(136,135,128,.6)');
+  CH['chAD']=new Chart(document.getElementById('chAD'),{type:'bar',
+    data:{labels:labs,datasets:[{data:vals,backgroundColor:cols,borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' $'+c.raw+'M'}}},
+      scales:{x:{ticks:{callback:v=>'$'+v+'M',font:{size:9}},grid:{color:'rgba(0,0,0,.05)'}},y:{ticks:{font:{size:9}},grid:{display:false}}}}});
+  document.getElementById('t-ad').textContent=isAll()?'Daño estimado por actividad — top 12 ()':'Daño por actividad — clusters seleccionados ()';
+}
+function renderSD(){
+  dst('chSD');
+  const d=D.act_subdecl,labs=d.map(r=>r.Actividad.length>22?r.Actividad.slice(0,20)+'…':r.Actividad);
+  const vals=d.map(r=>r.pct_miente),cols=vals.map(v=>v>=60?'rgba(163,45,45,.85)':v>=50?'rgba(133,79,11,.75)':'rgba(24,95,165,.7)');
+  CH['chSD']=new Chart(document.getElementById('chSD'),{type:'bar',
+    data:{labels:labs,datasets:[{data:vals,backgroundColor:cols,borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.raw+'% subdeclaran'}}},
+      scales:{x:{max:75,ticks:{callback:v=>v+'%',font:{size:9}},grid:{color:'rgba(0,0,0,.05)'}},y:{ticks:{font:{size:9}},grid:{display:false}}}}});
+}
+function renderAC(){
+  dst('chAC');
+  const cls=active(),top8=ACTS.slice(0,8),labs=top8.map(a=>a.length>18?a.slice(0,16)+'…':a);
+  if(isAll()||cls.length>1){
+    CH['chAC']=new Chart(document.getElementById('chAC'),{type:'bar',
+      data:{labels:labs,datasets:cls.map(cl=>({label:cl,data:top8.map(a=>{const r=D.by_activity_cluster.find(x=>x.Actividad===a&&x.cluster===cl);return r?+(r.dano/1e6).toFixed(2):0;}),backgroundColor:CC[cl]+'CC',borderRadius:2}))},
+      options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{position:'bottom',labels:{font:{size:9},padding:6}},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': $'+c.raw+'M'}}},
+        scales:{x:{stacked:true,ticks:{callback:v=>'$'+v+'M',font:{size:9}},grid:{color:'rgba(0,0,0,.05)'}},y:{stacked:true,ticks:{font:{size:9}},grid:{display:false}}}}});
+    document.getElementById('t-ac').textContent='Composición del daño por cluster dentro de actividades';
+  } else {
+    const cl=cls[0],rows=D.by_interval_cluster.filter(r=>r.cluster===cl&&r.dano>0);
+    const il=INTV.filter(i=>rows.find(r=>r.intv_deseado===i));
+    CH['chAC']=new Chart(document.getElementById('chAC'),{type:'bar',
+      data:{labels:il,datasets:[{label:'Daño ($M)',data:il.map(i=>{const r=rows.find(x=>x.intv_deseado===i);return r?+(r.dano/1e6).toFixed(2):0;}),backgroundColor:CC[cl]+'BB',borderRadius:3}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' $'+c.raw+'M'}}},
+        scales:{x:{grid:{display:false},ticks:{autoSkip:false,maxRotation:35,font:{size:9}}},y:{ticks:{callback:v=>'$'+v+'M',font:{size:9}},grid:{color:'rgba(0,0,0,.05)'}}}}});
+    document.getElementById('t-ac').textContent='Daño estimado por intervalo de peso — '+cl;
+  }
+}
+function renderME(){
+  dst('chME');
+  const d=D.by_month;
+  CH['chME']=new Chart(document.getElementById('chME'),{type:'bar',
+    data:{labels:d.map(r=>r.mes_str),datasets:[
+      {label:'Daño ($M)',data:d.map(r=>+(r.dano/1e6).toFixed(0)),backgroundColor:'rgba(24,95,165,.8)',borderRadius:5,yAxisID:'y'},
+      {type:'line',label:'% s/facturación',data:d.map(r=>r.pct_fact),borderColor:'#A32D2D',backgroundColor:'rgba(163,45,45,.1)',pointBackgroundColor:'#A32D2D',pointRadius:5,tension:.3,yAxisID:'y2'},
+      {type:'line',label:'$/envío',data:d.map(r=>r.ajuste),borderColor:'#BA7517',backgroundColor:'transparent',pointBackgroundColor:'#BA7517',pointRadius:5,tension:.3,yAxisID:'y3',borderDash:[4,3]},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{font:{size:10},padding:10}},
+        tooltip:{callbacks:{label:c=>c.datasetIndex===0?' $'+c.raw+'M':c.datasetIndex===1?' '+c.raw+'%':' $'+fN(c.raw)+'/envío'}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:11}}},
+        y:{position:'left',ticks:{callback:v=>'$'+v+'M',font:{size:9}},grid:{color:'rgba(0,0,0,.05)'}},
+        y2:{position:'right',ticks:{callback:v=>v+'%',font:{size:9}},grid:{display:false}},y3:{display:false}}}});
+}
+function renderTblCl(){
+  const rows=D.by_clasificacion,maxD=Math.max(...rows.map(r=>r.dano));
+  document.getElementById('tbl-cl').innerHTML='<thead><tr><th>Clasificación</th><th class="r">Envíos</th><th class="r">Daño estimado</th><th class="r">Beneficio est.</th><th class="r">Daño/envío</th><th class="r">% del daño</th></tr></thead><tbody>'+
+    rows.map(r=>'<tr><td><strong>'+r.clas+'</strong></td><td class="r">'+fN(r.envios)+'</td><td class="r"><span class="bm" style="width:'+Math.round(r.dano/maxD*50)+'px;background:var(--red);opacity:.6"></span>'+fM(r.dano)+'</td><td class="r" style="color:var(--green)">'+fM(r.benef)+'</td><td class="r">$'+fN(r.dano_unit)+'</td><td class="r">'+r.pct_dano+'%</td></tr>').join('')+'</tbody>';
+}
+function renderTblIv(){
+  const cls=active(),rows=[];
+  INTV.forEach(intv=>{
+    let dano=0,envios=0;
+    if(isAll()){const r=D.by_interval.find(x=>x.intv_deseado===intv);if(r){dano=r.dano;envios=r.envios;}}
+    else{D.by_interval_cluster.filter(r=>r.intv_deseado===intv&&cls.includes(r.cluster)).forEach(r=>{dano+=r.dano;envios+=r.envios;});}
+    if(envios>0)rows.push({intv,dano,envios,aj:envios>0?Math.round(dano/envios):0});
+  });
+  const gd=D.by_interval;
+  document.getElementById('tbl-iv').innerHTML='<thead><tr><th>Intervalo de peso (g)</th><th class="r">Envíos</th><th class="r">Daño estimado</th><th class="r">Ajuste $/envío</th><th class="r">% del daño</th><th>Señal</th></tr></thead><tbody>'+
+    rows.map(r=>{
+      const gr=gd.find(x=>x.intv_deseado===r.intv);
+      const pct=gr?gr.pct_dano:0;
+      const cc=r.aj<=0?'g':r.aj>10000?'r':'a';
+      const sig=r.aj<=0?'✓ Daño mínimo':r.aj>20000?'⚠ Crítico':r.aj>5000?'▲ Alto':'– Moderado';
+      return '<tr><td><strong>'+r.intv+'</strong></td><td class="r">'+fN(r.envios)+'</td><td class="r">'+fM(r.dano)+'</td><td class="r kv '+cc+'" style="font-size:12px">$'+fN(r.aj)+'</td><td class="r">'+pct+'%</td><td>'+sig+'</td></tr>';
+    }).join('')+'</tbody>';
+  document.getElementById('t-ti').textContent=isAll()?'Ajuste sugerido por intervalo de peso — detalle (hasta 100 kg)':'Ajuste por intervalo — clusters seleccionados';
+}
+function renderTblTc(){
+  const cls=active(),rows=isAll()?D.top_clients:D.top_clients.filter(r=>cls.includes(r.cluster));
+  const maxD=Math.max(...D.top_clients.map(r=>r.dano));
+  document.getElementById('tbl-tc').innerHTML='<thead><tr><th>#</th><th>Cliente</th><th>Actividad</th><th>Cluster</th><th class="r">Envíos</th><th class="r">Daño est.</th><th class="r">$/envío</th><th class="r">% subdecl.</th></tr></thead><tbody>'+
+    rows.slice(0,15).map((r,i)=>{
+      const pct=Math.round(r.pct_miente*100),bw=Math.round(r.dano/maxD*55);
+      return '<tr><td style="color:var(--gm)">'+(i+1)+'</td><td><strong>'+r.des_usuario+'</strong></td><td style="font-size:11px;color:var(--gm)">'+r.Actividad+'</td><td><span class="bdg" style="background:'+CL[r.cluster]+';color:'+CC[r.cluster]+'">'+r.cluster+'</span></td><td class="r">'+fN(r.envios)+'</td><td class="r"><span class="bm" style="width:'+bw+'px;background:'+CC[r.cluster]+'66"></span>'+fM(r.dano)+'</td><td class="r" style="font-weight:600">$'+fN(r.dano_unit)+'</td><td class="r" style="color:'+(pct>=70?'var(--red)':pct>=50?'var(--amber)':'var(--green)')+';font-weight:600">'+pct+'%</td></tr>';
+    }).join('')+'</tbody>';
+  document.getElementById('t-tc').textContent=isAll()?'Top 20 clientes por daño estimado':'Top clientes — clusters seleccionados';
+}
+function renderAll(){
+  renderCtx();renderIgs();
+  renderCD();renderCE();renderIV();
+  renderAD();renderSD();renderAC();renderME();
+  renderTblCl();renderTblIv();renderTblTc();
+}
+renderAll();
+</script>
+</div>
+
+
+<div class="wrap" id="mod-cupones-wrap" style="display:none">
+  <div class="mod-nota" style="margin-top:.625rem">
+    <strong>Módulo complementario — Cupones y Política de Descuentos.</strong>
+    Los valores de daño estimado usan la misma metodología del análisis principal.
+    Los montos de CostoOriginalSINIVA y reFacturación ya están libres del efecto de los descuentos aplicados.
+  </div>
+
+  <div class="sec" style="margin-top:.5rem">Métricas del módulo</div>
+  <div class="kpis" id="mod-kpis"></div>
+
+  <div class="g2" style="margin-bottom:.875rem">
+    <div class="card">
+      <div class="ct">Subdeclaración y daño/envío según nivel de descuento</div>
+      <div class="cs" id="cs-bonif">A mayor descuento, mayor tasa de subdeclaración y mayor daño por envío</div>
+      <div style="position:relative;height:270px"><canvas id="chBonifCat"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Evolución mensual — descuentos y subdeclaración</div>
+      <div style="position:relative;height:270px"><canvas id="chMesBonif"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card full" style="margin-bottom:.875rem">
+    <div class="ct">Cuadrantes: nivel de descuento vs. comportamiento de subdeclaración</div>
+    <div class="cs">Umbral descuento: 20% · Umbral subdeclaración: 60% de registros</div>
+    <div class="quad-grid" id="quad-cards"></div>
+  </div>
+
+  <div class="g2" style="margin-bottom:.875rem">
+    <div class="card">
+      <div class="ct">Dispersión por cliente: descuento vs. % que subdeclara</div>
+      <div class="cs">Cada punto es un cliente. Tamaño proporcional al daño estimado. Color según cuadrante.</div>
+      <div style="position:relative;height:300px"><canvas id="chScatter"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Top 12 cupones por daño estimado</div>
+      <div class="cs">Color: rojo ≥65% subdeclara · naranja 50-65% · azul &lt;50%</div>
+      <div style="position:relative;height:300px"><canvas id="chCupones"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card full" style="margin-bottom:.875rem">
+    <div class="ct">Top 15 clientes con doble beneficio — descuento >20% y subdeclaración >60%</div>
+    <div class="cs">Estos clientes reciben simultáneamente precio preferencial y subdeclaran peso. La auditoría debe incluir la revisión de ambas condiciones.</div>
+    <div style="overflow-x:auto"><table class="tbl" id="tbl-doble"></table></div>
+  </div>
+
+  <div class="card full" style="margin-bottom:.875rem">
+    <div class="ct">Cupones nominativos con mayor daño estimado</div>
+    <div class="cs">Cupones asignados a un único cliente. Conviene revisarlos en el proceso de auditoría individual — son condiciones personalizadas otorgadas a clientes específicos.</div>
+    <div style="overflow-x:auto"><table class="tbl" id="tbl-nom"></table></div>
+  </div>
+</div>
+
+
+<script>
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('main-wrap').style.display = tab==='main'?'':' none';
+  document.getElementById('mod-cupones-wrap').style.display = tab==='cupones'?'':' none';
+  if(tab==='cupones'&&!window._modBuilt){buildModCharts();window._modBuilt=true;}
+}
+</script>
+
+
+<script>
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const mainWrap = document.querySelector('.wrap');
+  const modWrap  = document.getElementById('mod-cupones-wrap');
+  const filterBar = document.getElementById('ctx')?.closest('.wrap');
+  if (tab === 'main') {
+    mainWrap.style.display = '';
+    modWrap.style.display = 'none';
+  } else {
+    mainWrap.style.display = 'none';
+    modWrap.style.display = '';
+    if (!window._modCharsBuilt) { buildModCharts(); window._modCharsBuilt = true; }
+  }
+}
+
+const M = {"kpis":{"pct_envios_con_bonif":71.8,"bonif_prom_global":15.9,"bonif_prom_con_desc":25.5,"n_cupones_unicos":690,"pct_dano_doble_benef":47.3,"n_clientes_doble":5044,"bonif_prom_doble":27.1},"by_bonif_cat":[{"bonif_cat":"0% (sin descuento)","envios":381697,"pct_subdeclara":49.8,"dano":1122326227.693547,"dano_unit":2940.0,"pct_dano":21.0},{"bonif_cat":"1-10%","envios":44849,"pct_subdeclara":60.7,"dano":194486148.7990592,"dano_unit":4336.0,"pct_dano":3.6},{"bonif_cat":"11-20%","envios":320754,"pct_subdeclara":52.7,"dano":1480534965.9571414,"dano_unit":4616.0,"pct_dano":27.7},{"bonif_cat":"21-30%","envios":509534,"pct_subdeclara":52.8,"dano":2309512053.4640665,"dano_unit":4533.0,"pct_dano":43.3},{"bonif_cat":"31-40%","envios":93166,"pct_subdeclara":66.0,"dano":210714586.3075902,"dano_unit":2262.0,"pct_dano":3.9},{"bonif_cat":">40%","envios":4314,"pct_subdeclara":63.9,"dano":19520629.66043958,"dano_unit":4525.0,"pct_dano":0.4}],"by_month":[{"mes_str":"2026-03","envios":466765,"pct_con_bonif":53.6,"bonif_prom":12.8,"pct_subdeclara":49.3,"dano":1690417147.0620222,"ajuste_unit":3622.0},{"mes_str":"2026-04","envios":413895,"pct_con_bonif":66.8,"bonif_prom":17.4,"pct_subdeclara":53.5,"dano":1876992108.6246302,"ajuste_unit":4535.0},{"mes_str":"2026-05","envios":473654,"pct_con_bonif":66.5,"bonif_prom":17.6,"pct_subdeclara":53.3,"dano":1769685356.1951914,"ajuste_unit":3736.0}],"top_cupones":[{"cupon":"ANDREANI20","envios":264851,"clientes":17010,"bonif_prom":19.8,"pct_subdeclara":52.1,"dano":1354244405.1808,"meses":3,"dano_unit":5113.0},{"cupon":"DESCUENTOPROMOCIONAL","envios":275996,"clientes":15076,"bonif_prom":28.1,"pct_subdeclara":53.2,"dano":1214730290.7533224,"meses":3,"dano_unit":4401.0},{"cupon":"SIN_DESCUENTO","envios":378994,"clientes":39238,"bonif_prom":0.0,"pct_subdeclara":49.8,"dano":1113335549.0948734,"meses":3,"dano_unit":2938.0},{"cupon":"PABLOREALES30","envios":7980,"clientes":2,"bonif_prom":28.6,"pct_subdeclara":78.1,"dano":162053357.24581164,"meses":3,"dano_unit":20307.0},{"cupon":"S066-MARIAREVEN30","envios":2013,"clientes":83,"bonif_prom":30.0,"pct_subdeclara":56.8,"dano":121451392.57816555,"meses":3,"dano_unit":60334.0},{"cupon":"BALAHOGAR30","envios":2554,"clientes":1,"bonif_prom":35.0,"pct_subdeclara":76.5,"dano":101640112.80640289,"meses":3,"dano_unit":39796.0},{"cupon":"CUATROIDEAS25","envios":4692,"clientes":2,"bonif_prom":25.0,"pct_subdeclara":84.0,"dano":79778967.87526883,"meses":3,"dano_unit":17003.0},{"cupon":"EOWOLSA30","envios":2183,"clientes":1,"bonif_prom":30.0,"pct_subdeclara":72.5,"dano":75293331.76295304,"meses":3,"dano_unit":34491.0},{"cupon":"REVAGUASBLANCAS30","envios":3267,"clientes":145,"bonif_prom":29.8,"pct_subdeclara":47.6,"dano":71342047.3088895,"meses":3,"dano_unit":21837.0},{"cupon":"ROMANS30","envios":3302,"clientes":2,"bonif_prom":25.6,"pct_subdeclara":85.2,"dano":70881140.73700014,"meses":1,"dano_unit":21466.0},{"cupon":"S051-CUPONESTARAL30%","envios":38349,"clientes":497,"bonif_prom":20.0,"pct_subdeclara":60.6,"dano":68661612.88454174,"meses":3,"dano_unit":1790.0},{"cupon":"LALANNETOMAS35","envios":11597,"clientes":1,"bonif_prom":33.3,"pct_subdeclara":78.0,"dano":57566561.113730654,"meses":3,"dano_unit":4964.0},{"cupon":"UN20MENOS","envios":10657,"clientes":336,"bonif_prom":19.7,"pct_subdeclara":63.3,"dano":57287032.832328856,"meses":3,"dano_unit":5376.0},{"cupon":"BODEGAS2025","envios":5872,"clientes":406,"bonif_prom":29.7,"pct_subdeclara":25.0,"dano":19971066.265148997,"meses":3,"dano_unit":3401.0},{"cupon":"TOKIOLENCERIA30","envios":1544,"clientes":1,"bonif_prom":28.8,"pct_subdeclara":82.7,"dano":16835071.768769227,"meses":3,"dano_unit":10904.0}],"cuadrantes":[{"label":"Alto descuento + Alta subdecl.","color":"#A32D2D","clientes":5044,"envios":504037,"dano":2524944353.0825453,"pct_dano":47.3},{"label":"Alto descuento + Baja subdecl.","color":"#854F0B","clientes":9224,"envios":189722,"dano":512895187.7311369,"pct_dano":9.6},{"label":"Bajo descuento + Alta subdecl.","color":"#185FA5","clientes":13146,"envios":396353,"dano":1910952923.2967024,"pct_dano":35.8},{"label":"Bajo descuento + Baja subdecl.","color":"#3B6D11","clientes":31293,"envios":264202,"dano":388302147.77145934,"pct_dano":7.3}],"scatter":[{"des_usuario":"FARFAN DAMIAN","bonif_prom":20.0,"pct_subdeclara":25.0,"dano":56656.0,"envios":12,"actividad":"sin actividad"},{"des_usuario":"SEBASTIAN CRUZ","bonif_prom":25.8,"pct_subdeclara":84.2,"dano":534655.0,"envios":56,"actividad":"Calzado"},{"des_usuario":"CUBILLAS NICOLAS XAVIER","bonif_prom":27.0,"pct_subdeclara":85.0,"dano":262734.0,"envios":35,"actividad":"Electrodomésticos"},{"des_usuario":"VELAS VARELA- GONZALO","bonif_prom":22.9,"pct_subdeclara":0.0,"dano":0.0,"envios":23,"actividad":"Bazar y/o Decoración"},{"des_usuario":"IGNACIO SANTANA","bonif_prom":28.3,"pct_subdeclara":88.9,"dano":52839.0,"envios":49,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"EDUARDO DAVID VACA","bonif_prom":8.0,"pct_subdeclara":0.0,"dano":0.0,"envios":204,"actividad":"Bazar y/o Decoración"},{"des_usuario":"AGUSTINA BELEN CHAVES","bonif_prom":0.0,"pct_subdeclara":60.0,"dano":928.0,"envios":15,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"DANIELA LELL","bonif_prom":29.0,"pct_subdeclara":80.0,"dano":43152.0,"envios":11,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"JAQUELINE SUGIA","bonif_prom":0.7,"pct_subdeclara":81.5,"dano":12483397.0,"envios":1487,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"LIBRERIA PLATERITO","bonif_prom":0.9,"pct_subdeclara":63.6,"dano":56649.0,"envios":14,"actividad":"Librería y/o Artística"},{"des_usuario":"ARGENTINA STARVALL","bonif_prom":20.0,"pct_subdeclara":0.0,"dano":2595.0,"envios":24,"actividad":"Bazar y/o Decoración"},{"des_usuario":"GASTON RODRIGUEZ","bonif_prom":21.1,"pct_subdeclara":81.5,"dano":83781.0,"envios":109,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"GUSTAVO TORRIGLIA","bonif_prom":28.1,"pct_subdeclara":40.7,"dano":16514.0,"envios":117,"actividad":"Hobbies y/o Colecciones"},{"des_usuario":"MATÍAS PIZARRO","bonif_prom":20.7,"pct_subdeclara":46.7,"dano":36268.0,"envios":16,"actividad":"sin actividad"},{"des_usuario":"JUAN CRUZ EIRAS","bonif_prom":20.0,"pct_subdeclara":0.0,"dano":0.0,"envios":14,"actividad":"sin actividad"},{"des_usuario":"COMPAÑIA DENTAL ARGENTINA S.R.L. OCCIDENTAL","bonif_prom":2.3,"pct_subdeclara":23.1,"dano":9889.0,"envios":14,"actividad":"Salud"},{"des_usuario":"ROSINA PETRIZZO","bonif_prom":18.1,"pct_subdeclara":75.0,"dano":239173.0,"envios":32,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"STEFANO DONADIO","bonif_prom":30.0,"pct_subdeclara":33.3,"dano":199827.0,"envios":10,"actividad":"Metalúrgica"},{"des_usuario":"ANALIA LO VECCHIO","bonif_prom":26.2,"pct_subdeclara":0.0,"dano":72.0,"envios":61,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"LAURA ARIAS","bonif_prom":27.5,"pct_subdeclara":75.0,"dano":928.0,"envios":25,"actividad":"Textil"},{"des_usuario":"VALERIA NUÑEZ","bonif_prom":20.6,"pct_subdeclara":72.5,"dano":865646.0,"envios":273,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"GOYCOCHEA JUAN IGNACIO","bonif_prom":0.0,"pct_subdeclara":36.4,"dano":0.0,"envios":21,"actividad":"sin actividad"},{"des_usuario":"JOAQUÍN HECTOR LUNA","bonif_prom":20.0,"pct_subdeclara":50.0,"dano":18224.0,"envios":27,"actividad":"sin actividad"},{"des_usuario":"NEXO LOGÍSTICO","bonif_prom":11.4,"pct_subdeclara":92.9,"dano":2163825.0,"envios":197,"actividad":"Blanquería"},{"des_usuario":"PLAUNICK CARLOS","bonif_prom":26.5,"pct_subdeclara":40.5,"dano":6614.0,"envios":56,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"AGOSTINA HERNANDEZ","bonif_prom":10.3,"pct_subdeclara":69.2,"dano":53204.0,"envios":161,"actividad":"Tecnología e Informática"},{"des_usuario":"OPTICA PUNTODEVOTO","bonif_prom":24.5,"pct_subdeclara":90.9,"dano":4521.0,"envios":25,"actividad":"Óptica"},{"des_usuario":"JOYCE, PROUST & CO SRL JOYCE, PROUST & CO SRL","bonif_prom":0.0,"pct_subdeclara":80.0,"dano":8407.0,"envios":15,"actividad":"Librería y/o Artística"},{"des_usuario":"F SUPPLY","bonif_prom":1.1,"pct_subdeclara":33.3,"dano":3523.0,"envios":36,"actividad":"Hobbies y/o Colecciones"},{"des_usuario":"PICCININI MACARENA","bonif_prom":5.1,"pct_subdeclara":76.6,"dano":818533.0,"envios":269,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"CATENA CRISTINA","bonif_prom":20.0,"pct_subdeclara":0.0,"dano":0.0,"envios":79,"actividad":"Artesanías y/o productos regionales"},{"des_usuario":"GUILLERMO PANESSI SRL","bonif_prom":28.6,"pct_subdeclara":14.3,"dano":9817.0,"envios":14,"actividad":"Artesanías y/o productos regionales"},{"des_usuario":"MARTIN BORBEA ANTELO","bonif_prom":10.7,"pct_subdeclara":28.6,"dano":6120.0,"envios":36,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"LORENA SALVA","bonif_prom":20.0,"pct_subdeclara":83.3,"dano":213397.0,"envios":17,"actividad":"sin actividad"},{"des_usuario":"MATIAS DELLAPUPPA","bonif_prom":18.7,"pct_subdeclara":20.0,"dano":4000.0,"envios":25,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"UGARTE RAMIRO","bonif_prom":12.0,"pct_subdeclara":60.0,"dano":0.0,"envios":17,"actividad":"Tecnología e Informática"},{"des_usuario":"VALENTIN DECUNTO","bonif_prom":20.0,"pct_subdeclara":77.8,"dano":201797.0,"envios":61,"actividad":"sin actividad"},{"des_usuario":"MONACO DECOHOUSE","bonif_prom":15.8,"pct_subdeclara":10.5,"dano":139199.0,"envios":20,"actividad":"Mueblería"},{"des_usuario":"ADMINISTRACIÓN ALLICO","bonif_prom":0.0,"pct_subdeclara":42.9,"dano":21208.0,"envios":14,"actividad":"Autopartes"},{"des_usuario":"JOSE MARIA MARCHISIO","bonif_prom":21.2,"pct_subdeclara":32.4,"dano":242683.0,"envios":39,"actividad":"Agroindustria"},{"des_usuario":"EREXIT FILAMENTOS","bonif_prom":7.6,"pct_subdeclara":72.2,"dano":16229538.0,"envios":704,"actividad":"Máquinas y/o Herramientas"},{"des_usuario":"ZIBAH SIMPLE&COMFY","bonif_prom":7.1,"pct_subdeclara":83.9,"dano":765839.0,"envios":194,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"ALTER EGO INDUMENTARIA","bonif_prom":28.5,"pct_subdeclara":0.0,"dano":0.0,"envios":37,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"MAURO GARDI","bonif_prom":27.3,"pct_subdeclara":86.7,"dano":334983.0,"envios":16,"actividad":"Hobbies y/o Colecciones"},{"des_usuario":"COOPERATIVA EL COLONO","bonif_prom":30.0,"pct_subdeclara":59.5,"dano":886663.0,"envios":49,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"IGNACIO KLOSTER","bonif_prom":16.9,"pct_subdeclara":61.5,"dano":592653.0,"envios":15,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"AVENDAÑO LUCIA","bonif_prom":1.9,"pct_subdeclara":45.2,"dano":80847.0,"envios":45,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"MERCEDES ROJAS","bonif_prom":0.0,"pct_subdeclara":38.5,"dano":96544.0,"envios":17,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"MITO MITO","bonif_prom":20.0,"pct_subdeclara":11.1,"dano":65015.0,"envios":26,"actividad":"sin actividad"},{"des_usuario":"OSCAR VELAZCO","bonif_prom":21.0,"pct_subdeclara":40.0,"dano":15077.0,"envios":14,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"ADMINISTRACIÓN BANHAIA","bonif_prom":2.1,"pct_subdeclara":50.0,"dano":23591.0,"envios":16,"actividad":"Tecnología e Informática"},{"des_usuario":"MATIAS FEDERICO","bonif_prom":27.3,"pct_subdeclara":9.1,"dano":85644.0,"envios":37,"actividad":"Electrodomésticos"},{"des_usuario":"LUCIANA LUDUENA","bonif_prom":30.0,"pct_subdeclara":54.5,"dano":157349.0,"envios":12,"actividad":"Bazar y/o Decoración"},{"des_usuario":"AROMAS ABSOLUTOS SRL","bonif_prom":36.8,"pct_subdeclara":20.0,"dano":10745.0,"envios":10,"actividad":"Bazar y/o Decoración"},{"des_usuario":"JUAN GATTO","bonif_prom":10.0,"pct_subdeclara":55.6,"dano":12235.0,"envios":12,"actividad":"Autopartes"},{"des_usuario":"GAUDIANO VICTORIA","bonif_prom":9.1,"pct_subdeclara":47.8,"dano":6914.0,"envios":35,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"LEANDRO LEDESMA","bonif_prom":17.5,"pct_subdeclara":33.3,"dano":3072.0,"envios":12,"actividad":"Hobbies y/o Colecciones"},{"des_usuario":"INNOVA INDUSTRIAS SA","bonif_prom":12.9,"pct_subdeclara":57.1,"dano":63503.0,"envios":14,"actividad":"Máquinas y/o Herramientas"},{"des_usuario":"GISELA PALACIO","bonif_prom":0.0,"pct_subdeclara":50.0,"dano":0.0,"envios":26,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"TECNODRONARG ARG","bonif_prom":23.6,"pct_subdeclara":27.3,"dano":8538.0,"envios":11,"actividad":"Tecnología e Informática"},{"des_usuario":"FEDERICO IMPORTADOS AL VUELO","bonif_prom":21.1,"pct_subdeclara":83.8,"dano":929111.0,"envios":115,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"LYCOS CONSULTORÍAS Y EXPERIENCIAS","bonif_prom":20.0,"pct_subdeclara":0.0,"dano":0.0,"envios":21,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"CORBALAN NOELIA","bonif_prom":27.5,"pct_subdeclara":66.7,"dano":28992.0,"envios":12,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"VENTAS ELECTRO JOMA","bonif_prom":0.0,"pct_subdeclara":100.0,"dano":2855.0,"envios":15,"actividad":"Construcción"},{"des_usuario":"LUCAS STRIGLIO","bonif_prom":18.6,"pct_subdeclara":50.0,"dano":236188.0,"envios":52,"actividad":"sin actividad"},{"des_usuario":"BRISA RIOS","bonif_prom":20.0,"pct_subdeclara":60.0,"dano":8707494.0,"envios":71,"actividad":"sin actividad"},{"des_usuario":"ELA DAVICO","bonif_prom":11.2,"pct_subdeclara":68.8,"dano":32317.0,"envios":17,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"APARICIO JORGELINA","bonif_prom":8.3,"pct_subdeclara":66.0,"dano":392426.0,"envios":79,"actividad":"Bazar y/o Decoración"},{"des_usuario":"CELESTE ROMI","bonif_prom":5.5,"pct_subdeclara":44.8,"dano":78190.0,"envios":116,"actividad":"sin actividad"},{"des_usuario":"ANDRE MASY","bonif_prom":0.0,"pct_subdeclara":52.6,"dano":682664.0,"envios":259,"actividad":"Salud"},{"des_usuario":"MARTIN SIMITIAN","bonif_prom":18.0,"pct_subdeclara":30.0,"dano":72.0,"envios":14,"actividad":"Joyería y/o Bijouterie"},{"des_usuario":"MARCE SPERANZA","bonif_prom":0.0,"pct_subdeclara":33.3,"dano":52411.0,"envios":19,"actividad":"sin actividad"},{"des_usuario":"MELODY (MELMERCH)","bonif_prom":25.5,"pct_subdeclara":100.0,"dano":4638.0,"envios":23,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"MARIA FLORENCIA GIMENEZ","bonif_prom":3.8,"pct_subdeclara":70.3,"dano":184215.0,"envios":38,"actividad":"Bazar y/o Decoración"},{"des_usuario":"MARTIN EDUARDO RODRIGUEZ","bonif_prom":22.5,"pct_subdeclara":12.5,"dano":3769.0,"envios":12,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"BORREGO KAREN","bonif_prom":26.5,"pct_subdeclara":50.0,"dano":135890.0,"envios":28,"actividad":"Telecomunicaciones"},{"des_usuario":"ACUFLY DRONES","bonif_prom":20.0,"pct_subdeclara":0.0,"dano":0.0,"envios":19,"actividad":"sin actividad"},{"des_usuario":"MAREA JEANS","bonif_prom":15.0,"pct_subdeclara":66.7,"dano":30250.0,"envios":31,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"HECTOR SÁNCHEZ","bonif_prom":26.0,"pct_subdeclara":80.0,"dano":44332.0,"envios":10,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"ELIANA DELL ERA","bonif_prom":4.6,"pct_subdeclara":53.8,"dano":15163.0,"envios":13,"actividad":"Hobbies y/o Colecciones"},{"des_usuario":"SANTIAGO LOVAGNINI","bonif_prom":8.6,"pct_subdeclara":28.6,"dano":0.0,"envios":74,"actividad":"Electrodomésticos"},{"des_usuario":"ROJAS EDUARDO DAVID","bonif_prom":23.3,"pct_subdeclara":22.2,"dano":0.0,"envios":19,"actividad":"Ferretería"},{"des_usuario":"ERIC MILOSEVIC","bonif_prom":29.6,"pct_subdeclara":21.4,"dano":232566.0,"envios":16,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"SEBASTIAN RAPPAZZINI","bonif_prom":27.6,"pct_subdeclara":36.0,"dano":1040712.0,"envios":121,"actividad":"Mueblería"},{"des_usuario":"ORISSAFUNGI .","bonif_prom":18.0,"pct_subdeclara":56.0,"dano":4841.0,"envios":45,"actividad":"Agroindustria"},{"des_usuario":"BUGANVILIAN  ROMERO","bonif_prom":3.3,"pct_subdeclara":88.9,"dano":14045.0,"envios":25,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"CRISTIAN DENING","bonif_prom":30.0,"pct_subdeclara":68.2,"dano":1942257.0,"envios":290,"actividad":"Calzado"},{"des_usuario":"LEONEL GARCIA","bonif_prom":36.5,"pct_subdeclara":53.8,"dano":3844.0,"envios":15,"actividad":"Hobbies y/o Colecciones"},{"des_usuario":"CAPSULANDIA MARTIN","bonif_prom":24.8,"pct_subdeclara":88.3,"dano":3718383.0,"envios":729,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"INDUMENTARIA PLAYER","bonif_prom":16.7,"pct_subdeclara":8.3,"dano":17470.0,"envios":21,"actividad":"sin actividad"},{"des_usuario":"FLORENCIA NIEVAS","bonif_prom":28.2,"pct_subdeclara":90.9,"dano":114649.0,"envios":13,"actividad":"Bazar y/o Decoración"},{"des_usuario":"PABLO MANUEL  ALVAREZ","bonif_prom":20.0,"pct_subdeclara":75.0,"dano":47335.0,"envios":14,"actividad":"Metalúrgica"},{"des_usuario":"PAZ HANSEN","bonif_prom":26.5,"pct_subdeclara":15.0,"dano":0.0,"envios":24,"actividad":"Hobbies y/o Colecciones"},{"des_usuario":"FLORENCIA MARÍA CROATTO","bonif_prom":23.8,"pct_subdeclara":93.1,"dano":10839790.0,"envios":79,"actividad":"Mueblería"},{"des_usuario":"PELLEGRINO DEBORA","bonif_prom":18.8,"pct_subdeclara":88.2,"dano":129709.0,"envios":23,"actividad":"sin actividad"},{"des_usuario":"DI DONATIS LUCAS","bonif_prom":20.0,"pct_subdeclara":28.6,"dano":0.0,"envios":10,"actividad":"sin actividad"},{"des_usuario":"RAMIRO SILVA","bonif_prom":16.7,"pct_subdeclara":44.4,"dano":222912.0,"envios":11,"actividad":"Electrodomésticos"},{"des_usuario":"CALIFANO ALEXANDER","bonif_prom":25.4,"pct_subdeclara":38.5,"dano":3842.0,"envios":16,"actividad":"Autopartes"},{"des_usuario":"CHANCALAY ANA","bonif_prom":18.0,"pct_subdeclara":53.3,"dano":928.0,"envios":30,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"MARTIN MOTTA","bonif_prom":13.0,"pct_subdeclara":90.0,"dano":8407.0,"envios":14,"actividad":"Textil"},{"des_usuario":"LEANDRO RODRIGUEZ","bonif_prom":8.1,"pct_subdeclara":60.6,"dano":1010670.0,"envios":556,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"SANTIAGO SPELZINI","bonif_prom":23.7,"pct_subdeclara":61.5,"dano":159024.0,"envios":146,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"CIA INTRODUCTORA DE COMPONENTES EQUIPOS Y MAQ SRL","bonif_prom":24.0,"pct_subdeclara":80.0,"dano":29522.0,"envios":16,"actividad":"Tecnología e Informática"},{"des_usuario":"MATIAS SALAS","bonif_prom":26.1,"pct_subdeclara":72.7,"dano":4493004.0,"envios":81,"actividad":"Construcción"},{"des_usuario":"ALEJANDRO FERNÁNDEZ","bonif_prom":20.0,"pct_subdeclara":0.0,"dano":0.0,"envios":62,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"JONATHAN IRASMAY","bonif_prom":25.0,"pct_subdeclara":38.9,"dano":20929.0,"envios":22,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"BIASOTTI MARTIN","bonif_prom":23.1,"pct_subdeclara":69.2,"dano":166015.0,"envios":66,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"PALOMA CERVERA","bonif_prom":0.0,"pct_subdeclara":69.6,"dano":77063.0,"envios":311,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"PREMIUM CELL","bonif_prom":21.2,"pct_subdeclara":47.1,"dano":40780.0,"envios":21,"actividad":"Tecnología e Informática"},{"des_usuario":"LUNA KEVIN","bonif_prom":8.7,"pct_subdeclara":80.0,"dano":62068.0,"envios":48,"actividad":"Música"},{"des_usuario":"CLAUDIA SILVA","bonif_prom":2.5,"pct_subdeclara":50.0,"dano":11308.0,"envios":10,"actividad":"Bazar y/o Decoración"},{"des_usuario":"GOURMAND PLACE","bonif_prom":20.8,"pct_subdeclara":40.0,"dano":8841.0,"envios":61,"actividad":"Librería y/o Artística"},{"des_usuario":"IAN  ROMERO","bonif_prom":10.6,"pct_subdeclara":76.5,"dano":107078.0,"envios":26,"actividad":"Textil"},{"des_usuario":"BORZI PABLO","bonif_prom":20.8,"pct_subdeclara":15.4,"dano":10889.0,"envios":18,"actividad":"Profesional y/o Jurídico"},{"des_usuario":"JAVIER BAINOTTI","bonif_prom":0.0,"pct_subdeclara":45.0,"dano":6263.0,"envios":46,"actividad":"Artículos deportivos"},{"des_usuario":"FRANCO RETAMBAY","bonif_prom":25.7,"pct_subdeclara":0.0,"dano":0.0,"envios":11,"actividad":"Artesanías y/o productos regionales"},{"des_usuario":"MATHIAS BRITEZ","bonif_prom":20.0,"pct_subdeclara":72.2,"dano":9335.0,"envios":41,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"GUSTAVO MARTINEZ","bonif_prom":10.7,"pct_subdeclara":80.0,"dano":103588.0,"envios":42,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"VERONICA INES SALOME","bonif_prom":23.1,"pct_subdeclara":76.9,"dano":1122269.0,"envios":14,"actividad":"sin actividad"},{"des_usuario":"ANDAMIOS SJ","bonif_prom":0.0,"pct_subdeclara":40.0,"dano":16304.0,"envios":11,"actividad":"Jugueterías"},{"des_usuario":"CRISTIAN MERELLO","bonif_prom":29.6,"pct_subdeclara":56.5,"dano":355904.0,"envios":28,"actividad":"Salud"},{"des_usuario":"BAGGIES BG","bonif_prom":6.3,"pct_subdeclara":30.8,"dano":1145.0,"envios":17,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"RUSSO ELECTRÓNICA","bonif_prom":30.0,"pct_subdeclara":0.0,"dano":0.0,"envios":10,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"EZEQUIEL SZLUKIER","bonif_prom":21.0,"pct_subdeclara":47.6,"dano":24191.0,"envios":89,"actividad":"Librería y/o Artística"},{"des_usuario":"MARIE MARIE","bonif_prom":27.9,"pct_subdeclara":57.1,"dano":55336.0,"envios":18,"actividad":"Bazar y/o Decoración"},{"des_usuario":"VIOLI PAOLA","bonif_prom":15.9,"pct_subdeclara":17.6,"dano":4769.0,"envios":25,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"PERLA BEATRIZ RIZZI","bonif_prom":20.0,"pct_subdeclara":0.0,"dano":0.0,"envios":14,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"MATIAS NICOLAS ALFINI","bonif_prom":0.0,"pct_subdeclara":78.6,"dano":37084.0,"envios":20,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"ANA WEGMAN","bonif_prom":0.0,"pct_subdeclara":0.0,"dano":0.0,"envios":17,"actividad":"sin actividad"},{"des_usuario":"VITOBOX VITOBOX","bonif_prom":25.6,"pct_subdeclara":55.6,"dano":19846.0,"envios":11,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"MICA BELEN","bonif_prom":20.0,"pct_subdeclara":39.1,"dano":145946.0,"envios":47,"actividad":"sin actividad"},{"des_usuario":"BRENDA DUCOLI","bonif_prom":8.2,"pct_subdeclara":90.9,"dano":21007.0,"envios":24,"actividad":"Textil"},{"des_usuario":"GIULIANA GARAGEDECO","bonif_prom":28.1,"pct_subdeclara":61.3,"dano":562284.0,"envios":33,"actividad":"Mueblería"},{"des_usuario":"DIEGO CAYUELA","bonif_prom":20.0,"pct_subdeclara":37.5,"dano":71159.0,"envios":13,"actividad":"sin actividad"},{"des_usuario":"CHEVROFORD CHEVROFORD","bonif_prom":22.5,"pct_subdeclara":0.0,"dano":0.0,"envios":40,"actividad":"Autopartes"},{"des_usuario":"PAULA BILBAO","bonif_prom":10.6,"pct_subdeclara":47.1,"dano":67390.0,"envios":34,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"GAMIM .","bonif_prom":20.0,"pct_subdeclara":50.0,"dano":124262.0,"envios":13,"actividad":"Textil"},{"des_usuario":"DANIEL A. FERNANDEZ","bonif_prom":20.0,"pct_subdeclara":33.3,"dano":4408.0,"envios":16,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"ARIEL RODRIGUE","bonif_prom":20.0,"pct_subdeclara":9.1,"dano":928.0,"envios":14,"actividad":"Electrodomésticos"},{"des_usuario":"DE LA VEGA MARCELO","bonif_prom":20.0,"pct_subdeclara":28.6,"dano":10817.0,"envios":24,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"VIRU SHOES","bonif_prom":8.3,"pct_subdeclara":77.8,"dano":195949.0,"envios":26,"actividad":"Botánica y/o Jardinería"},{"des_usuario":"FACUNDO GIORDANO","bonif_prom":26.9,"pct_subdeclara":58.5,"dano":1899848.0,"envios":84,"actividad":"Ferretería"},{"des_usuario":"EZEQUIEL PRADO","bonif_prom":20.0,"pct_subdeclara":72.2,"dano":143907.0,"envios":32,"actividad":"sin actividad"},{"des_usuario":"PETTIT PAPILLON","bonif_prom":2.8,"pct_subdeclara":63.2,"dano":137556.0,"envios":156,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"DANIELA CUCHER","bonif_prom":0.9,"pct_subdeclara":59.0,"dano":405838.0,"envios":268,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"MARISA DOMINGUEZ","bonif_prom":0.0,"pct_subdeclara":60.7,"dano":37590.0,"envios":56,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"JAVIER MORENO","bonif_prom":30.0,"pct_subdeclara":0.0,"dano":0.0,"envios":11,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"RECALDE MARIA","bonif_prom":14.1,"pct_subdeclara":50.0,"dano":10915.0,"envios":85,"actividad":"Hobbies y/o Colecciones"},{"des_usuario":"DIEGO TOMAS PACE","bonif_prom":0.0,"pct_subdeclara":77.1,"dano":2108760.0,"envios":417,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"MELINA PEREA","bonif_prom":23.5,"pct_subdeclara":89.2,"dano":2976595.0,"envios":91,"actividad":"Bazar y/o Decoración"},{"des_usuario":"FERNANDO FERRARI","bonif_prom":21.8,"pct_subdeclara":88.2,"dano":841520.0,"envios":59,"actividad":"Salud"},{"des_usuario":"ALEJANDRA FICHERA","bonif_prom":27.5,"pct_subdeclara":75.0,"dano":19307.0,"envios":14,"actividad":"Artesanías y/o productos regionales"},{"des_usuario":"SANTIAGO ALBERTO PALAVECINO","bonif_prom":6.4,"pct_subdeclara":42.9,"dano":0.0,"envios":20,"actividad":"Salud"},{"des_usuario":"SILVIA SANDOR","bonif_prom":21.0,"pct_subdeclara":50.0,"dano":7000.0,"envios":18,"actividad":"Salud"},{"des_usuario":"TENGO STOCK BRIAN","bonif_prom":0.0,"pct_subdeclara":54.5,"dano":471868.0,"envios":23,"actividad":"sin actividad"},{"des_usuario":"JENA ALEXA","bonif_prom":24.5,"pct_subdeclara":81.8,"dano":591080.0,"envios":77,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"MC COUBREY DANIELA","bonif_prom":16.3,"pct_subdeclara":42.9,"dano":351861.0,"envios":39,"actividad":"Mueblería"},{"des_usuario":"STELLA MARIS VILTA","bonif_prom":16.0,"pct_subdeclara":60.0,"dano":2072.0,"envios":16,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"TU INMUEBLE MISIONES","bonif_prom":26.0,"pct_subdeclara":72.1,"dano":1527758.0,"envios":66,"actividad":"Mueblería"},{"des_usuario":"ONCE FOR TWICE FANCLUB ARGENTINA","bonif_prom":0.0,"pct_subdeclara":33.3,"dano":6638.0,"envios":42,"actividad":"Gráfica"},{"des_usuario":"SPOT&SALUDABLE  SRL","bonif_prom":14.6,"pct_subdeclara":32.4,"dano":19080.0,"envios":43,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"JULIETA IVANOFF","bonif_prom":0.0,"pct_subdeclara":84.6,"dano":54675.0,"envios":85,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"CLUB FIGURITA","bonif_prom":18.6,"pct_subdeclara":78.6,"dano":20586.0,"envios":25,"actividad":"Hobbies y/o Colecciones"},{"des_usuario":"CLAUDIA RODRIGUEZ","bonif_prom":23.8,"pct_subdeclara":0.0,"dano":0.0,"envios":17,"actividad":"Bazar y/o Decoración"},{"des_usuario":"AGOSTINA SPESCHA","bonif_prom":26.1,"pct_subdeclara":69.7,"dano":317471.0,"envios":64,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"ROMAN MORAN","bonif_prom":22.5,"pct_subdeclara":75.0,"dano":909915.0,"envios":20,"actividad":"Metalúrgica"},{"des_usuario":"LUIS GUILLERMO RIVERA","bonif_prom":26.2,"pct_subdeclara":0.0,"dano":10380.0,"envios":54,"actividad":"Agroindustria"},{"des_usuario":"CHATTÁS MARCELO","bonif_prom":6.7,"pct_subdeclara":11.1,"dano":217.0,"envios":10,"actividad":"Artículos deportivos"},{"des_usuario":"ROBERTO BADIA","bonif_prom":20.8,"pct_subdeclara":8.3,"dano":0.0,"envios":15,"actividad":"Ferretería"},{"des_usuario":"MAILEN OLIVERO","bonif_prom":8.0,"pct_subdeclara":0.0,"dano":0.0,"envios":206,"actividad":"Metalúrgica"},{"des_usuario":"LUDMILA FARIAS","bonif_prom":20.0,"pct_subdeclara":55.6,"dano":60703.0,"envios":23,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"SANJUSTO NEWRED","bonif_prom":19.2,"pct_subdeclara":56.6,"dano":2578385.0,"envios":226,"actividad":"sin actividad"},{"des_usuario":"DESPACHOS EL GRAN 28","bonif_prom":8.0,"pct_subdeclara":55.0,"dano":50632.0,"envios":143,"actividad":"Tecnología e Informática"},{"des_usuario":"MELANIE  SHOES","bonif_prom":30.0,"pct_subdeclara":100.0,"dano":28618.0,"envios":10,"actividad":"Calzado"},{"des_usuario":"NICOLAS DE FRUTOS","bonif_prom":22.3,"pct_subdeclara":23.1,"dano":7192.0,"envios":39,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"LEAL TOMAS","bonif_prom":17.6,"pct_subdeclara":52.7,"dano":35273.0,"envios":157,"actividad":"Hobbies y/o Colecciones"},{"des_usuario":"INSUMOS BIJOU","bonif_prom":21.8,"pct_subdeclara":18.2,"dano":6120.0,"envios":46,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"MAXIMO ROLDAN","bonif_prom":22.9,"pct_subdeclara":23.8,"dano":13586.0,"envios":26,"actividad":"Calzado"},{"des_usuario":"SHEILA CARAUNI","bonif_prom":5.8,"pct_subdeclara":80.6,"dano":346468.0,"envios":51,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"ORLANDO DI MEGLIO","bonif_prom":28.1,"pct_subdeclara":31.2,"dano":0.0,"envios":22,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"ARRIETA TAMARA ANAHI","bonif_prom":28.8,"pct_subdeclara":40.5,"dano":1506768.0,"envios":86,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"CARINA TONI","bonif_prom":23.5,"pct_subdeclara":58.8,"dano":112067.0,"envios":24,"actividad":"Bazar y/o Decoración"},{"des_usuario":"MUCCIO IARA","bonif_prom":29.6,"pct_subdeclara":62.5,"dano":31883.0,"envios":27,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"TOMAS OLANO","bonif_prom":17.1,"pct_subdeclara":14.3,"dano":32296.0,"envios":10,"actividad":"Máquinas y/o Herramientas"},{"des_usuario":"MATIAS V","bonif_prom":25.0,"pct_subdeclara":57.1,"dano":295048.0,"envios":36,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"MAURANO FRAN","bonif_prom":22.5,"pct_subdeclara":37.5,"dano":4769.0,"envios":22,"actividad":"Bazar y/o Decoración"},{"des_usuario":"MARTIN BOAN","bonif_prom":28.0,"pct_subdeclara":0.0,"dano":0.0,"envios":34,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"CELESTE  BALDOR","bonif_prom":6.0,"pct_subdeclara":80.0,"dano":38443.0,"envios":26,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"SHIO GOURMET","bonif_prom":8.9,"pct_subdeclara":24.3,"dano":36287.0,"envios":73,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"MALVINA JARA","bonif_prom":10.4,"pct_subdeclara":66.7,"dano":54222.0,"envios":93,"actividad":"Artículos deportivos"},{"des_usuario":"CASSA MATTE","bonif_prom":22.9,"pct_subdeclara":33.3,"dano":135622.0,"envios":20,"actividad":"Electrodomésticos"},{"des_usuario":"RAGGIO CARLOS A","bonif_prom":5.5,"pct_subdeclara":72.7,"dano":107059.0,"envios":11,"actividad":"Electrodomésticos"},{"des_usuario":"DAIANA VILLAGRA","bonif_prom":16.0,"pct_subdeclara":20.0,"dano":9817.0,"envios":12,"actividad":"sin actividad"},{"des_usuario":"COLQUE CESAR ALEJANDRO","bonif_prom":20.0,"pct_subdeclara":16.7,"dano":0.0,"envios":10,"actividad":"Tecnología e Informática"},{"des_usuario":"ADRIAN BLUM","bonif_prom":22.1,"pct_subdeclara":76.5,"dano":207563.0,"envios":68,"actividad":"Tecnología e Informática"},{"des_usuario":"LILIA DIAZ","bonif_prom":20.0,"pct_subdeclara":36.4,"dano":12307.0,"envios":24,"actividad":"sin actividad"},{"des_usuario":"LANA PIEDRA","bonif_prom":0.0,"pct_subdeclara":50.0,"dano":18224.0,"envios":19,"actividad":"sin actividad"},{"des_usuario":"DROPER OFICIAL","bonif_prom":18.5,"pct_subdeclara":53.8,"dano":6131.0,"envios":19,"actividad":"Tecnología e Informática"},{"des_usuario":"GONZALO GÜICHAL","bonif_prom":0.0,"pct_subdeclara":0.0,"dano":1302.0,"envios":30,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"LILIANA BEATRIZ CARDOZO","bonif_prom":9.3,"pct_subdeclara":35.5,"dano":37297.0,"envios":107,"actividad":"Artículos deportivos"},{"des_usuario":"CELESTE ABIGAIL ACOSTA","bonif_prom":25.7,"pct_subdeclara":72.8,"dano":2948387.0,"envios":443,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"FRANCISCO CANTORO","bonif_prom":10.9,"pct_subdeclara":81.2,"dano":19710352.0,"envios":206,"actividad":"Mueblería"},{"des_usuario":"SANTIAGO CONTI","bonif_prom":29.5,"pct_subdeclara":13.6,"dano":5986.0,"envios":48,"actividad":"Gráfica"},{"des_usuario":"MOTOVERDE WEB","bonif_prom":18.8,"pct_subdeclara":87.5,"dano":137410.0,"envios":20,"actividad":"Autopartes"},{"des_usuario":"VICTOR JAVIER SUTERA","bonif_prom":27.0,"pct_subdeclara":70.0,"dano":8348.0,"envios":16,"actividad":"Mascotas"},{"des_usuario":"AGOSTINA PELLEGRINO","bonif_prom":18.7,"pct_subdeclara":73.9,"dano":379113.0,"envios":58,"actividad":"Bazar y/o Decoración"},{"des_usuario":"SEBASTIAN BENAVIDEZ","bonif_prom":0.0,"pct_subdeclara":85.7,"dano":87018.0,"envios":13,"actividad":"sin actividad"},{"des_usuario":"VILCA FRANCO","bonif_prom":0.0,"pct_subdeclara":15.4,"dano":6048.0,"envios":15,"actividad":"sin actividad"},{"des_usuario":"SANT ANGELO RAFAEL","bonif_prom":25.7,"pct_subdeclara":71.4,"dano":12321.0,"envios":10,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"RAMSES  DISEÑOS EXCLUSIVOS","bonif_prom":13.8,"pct_subdeclara":71.4,"dano":15946.0,"envios":55,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"ADRIANA BUGNONE","bonif_prom":20.0,"pct_subdeclara":25.0,"dano":17428.0,"envios":14,"actividad":"Salud"},{"des_usuario":"TOMMASO CARUSO","bonif_prom":19.2,"pct_subdeclara":9.1,"dano":4617.0,"envios":105,"actividad":"Artículos deportivos"},{"des_usuario":"AGUSTIN HUNZIKER","bonif_prom":15.0,"pct_subdeclara":0.0,"dano":0.0,"envios":11,"actividad":"Mascotas"},{"des_usuario":"RODRIGO GONZALEZ","bonif_prom":8.6,"pct_subdeclara":57.1,"dano":1855.0,"envios":17,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"BRINSER BRINSER","bonif_prom":29.1,"pct_subdeclara":57.1,"dano":64293.0,"envios":39,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"ZARANY SOCIEDAD ANONIMA","bonif_prom":20.0,"pct_subdeclara":84.0,"dano":18202458.0,"envios":1456,"actividad":"Textil"},{"des_usuario":"GERARDO CARBRAL","bonif_prom":7.5,"pct_subdeclara":50.0,"dano":11308.0,"envios":12,"actividad":"Artículos deportivos"},{"des_usuario":"GUAYMAS GONZALO","bonif_prom":25.9,"pct_subdeclara":70.6,"dano":65145.0,"envios":25,"actividad":"sin actividad"},{"des_usuario":"FRAN KELLY","bonif_prom":20.0,"pct_subdeclara":75.0,"dano":49515.0,"envios":121,"actividad":"Artículos deportivos"},{"des_usuario":"STAMPIN MAREK","bonif_prom":20.0,"pct_subdeclara":16.7,"dano":12096.0,"envios":26,"actividad":"Electrodomésticos"},{"des_usuario":"MARIO GIL","bonif_prom":7.9,"pct_subdeclara":57.9,"dano":5408.0,"envios":23,"actividad":"Artesanías y/o productos regionales"},{"des_usuario":"BIANCUCCI GIULIANO","bonif_prom":20.0,"pct_subdeclara":75.0,"dano":0.0,"envios":20,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"SERGIO WERLE","bonif_prom":30.0,"pct_subdeclara":52.6,"dano":280944.0,"envios":19,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"PAULA CAMACARO","bonif_prom":11.2,"pct_subdeclara":65.1,"dano":90324.0,"envios":65,"actividad":"Bazar y/o Decoración"},{"des_usuario":"NEO BAG","bonif_prom":3.0,"pct_subdeclara":60.0,"dano":44822.0,"envios":11,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"DIEGO BENAVIDEZ","bonif_prom":22.5,"pct_subdeclara":25.0,"dano":0.0,"envios":15,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"GUIDO GUIDO","bonif_prom":22.3,"pct_subdeclara":92.3,"dano":31810.0,"envios":17,"actividad":"sin actividad"},{"des_usuario":"FUNDACION INSTITUTO UNIVERSITARIO ESCUELA DE MEDICINA DEL HOSPITAL ITALIANO DE BUENOS AIRES  .","bonif_prom":100.0,"pct_subdeclara":40.0,"dano":0.0,"envios":10,"actividad":"Salud"},{"des_usuario":"DANIEL POMAR","bonif_prom":30.0,"pct_subdeclara":15.8,"dano":6048.0,"envios":56,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"TEO MOTOS","bonif_prom":0.0,"pct_subdeclara":16.7,"dano":34941.0,"envios":12,"actividad":"sin actividad"},{"des_usuario":"SUR GIN SURGINOK","bonif_prom":28.7,"pct_subdeclara":21.7,"dano":21913.0,"envios":35,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"EMILIANO BENITO","bonif_prom":25.8,"pct_subdeclara":100.0,"dano":256910.0,"envios":70,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"ROBERTO SONDON","bonif_prom":10.8,"pct_subdeclara":41.0,"dano":87032.0,"envios":48,"actividad":"Ferretería"},{"des_usuario":"CHANGÜI ARGENTINA","bonif_prom":21.0,"pct_subdeclara":90.0,"dano":38515.0,"envios":15,"actividad":"Artesanías y/o productos regionales"},{"des_usuario":"SAPIENZA ALEJANDRO","bonif_prom":28.9,"pct_subdeclara":51.9,"dano":55827.0,"envios":33,"actividad":"Librería y/o Artística"},{"des_usuario":"ANDRES HOY","bonif_prom":0.0,"pct_subdeclara":0.0,"dano":0.0,"envios":10,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"LILIANA BIVONA","bonif_prom":25.7,"pct_subdeclara":47.6,"dano":22945.0,"envios":23,"actividad":"Electrodomésticos"},{"des_usuario":"ORTOPEDIA SUIZA","bonif_prom":11.5,"pct_subdeclara":54.5,"dano":318058.0,"envios":79,"actividad":"Óptica"},{"des_usuario":"LIBRERIA LA ROCA","bonif_prom":15.0,"pct_subdeclara":10.0,"dano":145.0,"envios":20,"actividad":"Librería y/o Artística"},{"des_usuario":"ANTONIETASPERGAMINO SILVINA","bonif_prom":3.0,"pct_subdeclara":66.7,"dano":271730.0,"envios":46,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"BAMBUA HOME","bonif_prom":21.0,"pct_subdeclara":83.3,"dano":353154.0,"envios":117,"actividad":"Textil"},{"des_usuario":"BERLINGER HAUS","bonif_prom":23.7,"pct_subdeclara":52.6,"dano":27832.0,"envios":19,"actividad":"Bazar y/o Decoración"},{"des_usuario":"CARLOS LALIK","bonif_prom":20.0,"pct_subdeclara":0.0,"dano":0.0,"envios":15,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"FERRETERIA MARANI SA MARANI","bonif_prom":22.4,"pct_subdeclara":38.1,"dano":56470.0,"envios":25,"actividad":"Ferretería"},{"des_usuario":"AGUSTINA GALLARDO","bonif_prom":27.1,"pct_subdeclara":78.6,"dano":15887.0,"envios":24,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"PADILLA JUAN CRUZ","bonif_prom":26.1,"pct_subdeclara":65.2,"dano":91762.0,"envios":52,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"FLORENCIA ORMEÑO","bonif_prom":18.7,"pct_subdeclara":73.3,"dano":254747.0,"envios":25,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"SIMON RUBEN","bonif_prom":0.0,"pct_subdeclara":0.0,"dano":0.0,"envios":11,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"LUISINA AGESTA","bonif_prom":2.9,"pct_subdeclara":61.9,"dano":16235.0,"envios":24,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"JAVIER TONARELLI","bonif_prom":30.0,"pct_subdeclara":0.0,"dano":0.0,"envios":11,"actividad":"Agroindustria"},{"des_usuario":"JOSE ALBERTO ARRIETA RAPID TEST ARGENTINA","bonif_prom":8.7,"pct_subdeclara":56.5,"dano":14128.0,"envios":29,"actividad":"Máquinas y/o Herramientas"},{"des_usuario":"BRUNO ALEJANDRO ALBENGA","bonif_prom":21.8,"pct_subdeclara":27.3,"dano":15160.0,"envios":12,"actividad":"Bazar y/o Decoración"},{"des_usuario":"MARINA CURABA","bonif_prom":2.1,"pct_subdeclara":78.6,"dano":78078.0,"envios":25,"actividad":"Bazar y/o Decoración"},{"des_usuario":"SARA MARIA JOSE NERI","bonif_prom":30.0,"pct_subdeclara":37.5,"dano":212221.0,"envios":14,"actividad":"Artesanías y/o productos regionales"},{"des_usuario":"MATIAS PANAINO","bonif_prom":20.0,"pct_subdeclara":80.0,"dano":252639.0,"envios":45,"actividad":"Tecnología e Informática"},{"des_usuario":"MARINA CEPPARO","bonif_prom":20.9,"pct_subdeclara":58.0,"dano":59181.0,"envios":405,"actividad":"Calzado"},{"des_usuario":"ERNESTINA GARGANTA","bonif_prom":6.0,"pct_subdeclara":56.1,"dano":276517.0,"envios":173,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"GRAFICA SHEFA","bonif_prom":14.8,"pct_subdeclara":69.6,"dano":2977.0,"envios":36,"actividad":"Gráfica"},{"des_usuario":"HORACIO FABRIS","bonif_prom":28.7,"pct_subdeclara":33.3,"dano":9112.0,"envios":26,"actividad":"Profesional y/o Jurídico"},{"des_usuario":"CAROLINA SOVERCHIA","bonif_prom":30.0,"pct_subdeclara":64.3,"dano":127940.0,"envios":21,"actividad":"Artesanías y/o productos regionales"},{"des_usuario":"JAVIER ALBERTO IBARRA","bonif_prom":24.8,"pct_subdeclara":61.9,"dano":32172.0,"envios":39,"actividad":"Artículos deportivos"},{"des_usuario":"DAIANA RECALDE","bonif_prom":30.0,"pct_subdeclara":0.0,"dano":0.0,"envios":10,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"ANA SÁNCHEZ","bonif_prom":26.0,"pct_subdeclara":73.3,"dano":57430.0,"envios":24,"actividad":"Artesanías y/o productos regionales"},{"des_usuario":"JOAQUIN RAMIREZ","bonif_prom":21.8,"pct_subdeclara":36.4,"dano":0.0,"envios":19,"actividad":"Artesanías y/o productos regionales"},{"des_usuario":"G&L ENVASES S.A.","bonif_prom":27.0,"pct_subdeclara":20.0,"dano":3595.0,"envios":10,"actividad":"Agroindustria"},{"des_usuario":"GIOIA FRANCO","bonif_prom":8.6,"pct_subdeclara":57.1,"dano":10829.0,"envios":17,"actividad":"Bazar y/o Decoración"},{"des_usuario":"MARCOS  ACCESORIO","bonif_prom":13.3,"pct_subdeclara":0.0,"dano":0.0,"envios":25,"actividad":"sin actividad"},{"des_usuario":"BLA BLA TIENDA BLA BLA TIENDA","bonif_prom":12.9,"pct_subdeclara":33.3,"dano":47480.0,"envios":81,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"DOLORES PAGANO","bonif_prom":17.3,"pct_subdeclara":64.9,"dano":169340.0,"envios":151,"actividad":"Textil"},{"des_usuario":"LUCIO ARRIGO","bonif_prom":16.7,"pct_subdeclara":77.8,"dano":2783.0,"envios":57,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"EMI FRANCO","bonif_prom":27.3,"pct_subdeclara":48.8,"dano":1307998.0,"envios":51,"actividad":"Artículos deportivos"},{"des_usuario":"SOUL GUARDAPOLVOS","bonif_prom":0.0,"pct_subdeclara":47.1,"dano":13059.0,"envios":83,"actividad":"Textil"},{"des_usuario":"MOSSOTTI ANDRES","bonif_prom":4.7,"pct_subdeclara":31.6,"dano":29966.0,"envios":33,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"LUIS CEJAS","bonif_prom":28.2,"pct_subdeclara":80.0,"dano":124334.0,"envios":99,"actividad":"Tecnología e Informática"},{"des_usuario":"DAN DEGO","bonif_prom":22.5,"pct_subdeclara":66.7,"dano":1928.0,"envios":12,"actividad":"Forrajería"},{"des_usuario":"EDITORIAL ASTREA SRL","bonif_prom":27.7,"pct_subdeclara":37.5,"dano":20427.0,"envios":116,"actividad":"Librería y/o Artística"},{"des_usuario":"ALAN GLEIZNYS","bonif_prom":23.3,"pct_subdeclara":33.3,"dano":23784.0,"envios":35,"actividad":"Metalúrgica"},{"des_usuario":"BONOMI FEDERICO","bonif_prom":0.0,"pct_subdeclara":37.5,"dano":7217.0,"envios":41,"actividad":"Artículos deportivos"},{"des_usuario":"LEONARDO DROGO","bonif_prom":5.5,"pct_subdeclara":18.2,"dano":10466.0,"envios":14,"actividad":"Artesanías y/o productos regionales"},{"des_usuario":"PAZ EVER","bonif_prom":28.0,"pct_subdeclara":46.7,"dano":368618.0,"envios":18,"actividad":"Construcción"},{"des_usuario":"LOPEZ BELEN","bonif_prom":3.0,"pct_subdeclara":80.0,"dano":665601.0,"envios":28,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"DILUX AR","bonif_prom":10.0,"pct_subdeclara":60.0,"dano":62982.0,"envios":23,"actividad":"Electrodomésticos"},{"des_usuario":"NOR INTEGRITY","bonif_prom":0.0,"pct_subdeclara":33.3,"dano":72.0,"envios":12,"actividad":"Salud"},{"des_usuario":"AMA & POLA","bonif_prom":0.0,"pct_subdeclara":74.4,"dano":290020.0,"envios":72,"actividad":"Bazar y/o Decoración"},{"des_usuario":"TARDIO ABEL","bonif_prom":0.0,"pct_subdeclara":72.7,"dano":91513.0,"envios":14,"actividad":"sin actividad"},{"des_usuario":"ESCOBAR MARIA VICTORIA","bonif_prom":0.0,"pct_subdeclara":0.0,"dano":72.0,"envios":17,"actividad":"Gráfica"},{"des_usuario":"EMPRESA RANWEY","bonif_prom":20.8,"pct_subdeclara":76.0,"dano":230156.0,"envios":493,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"REFEREE STAR.","bonif_prom":20.0,"pct_subdeclara":50.0,"dano":121500.0,"envios":11,"actividad":"sin actividad"},{"des_usuario":"MIGUEL ANGEL FIORENTINO","bonif_prom":17.5,"pct_subdeclara":83.3,"dano":149992.0,"envios":21,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"PAWTITAS SHOP","bonif_prom":14.7,"pct_subdeclara":80.0,"dano":627645.0,"envios":31,"actividad":"Mascotas"},{"des_usuario":"TIMAU CAFÉ","bonif_prom":24.0,"pct_subdeclara":90.0,"dano":34869.0,"envios":12,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"ROMINA MIA","bonif_prom":28.0,"pct_subdeclara":50.0,"dano":1072.0,"envios":10,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"CALDERON TIAGO","bonif_prom":26.4,"pct_subdeclara":71.4,"dano":160163.0,"envios":41,"actividad":"Indumentaria e Indumentaria deportiva"},{"des_usuario":"NATALIA VITUCCI","bonif_prom":24.0,"pct_subdeclara":35.0,"dano":6048.0,"envios":22,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"GISELA BALENA","bonif_prom":18.0,"pct_subdeclara":70.0,"dano":0.0,"envios":10,"actividad":"Bazar y/o Decoración"},{"des_usuario":"TIENDA CHAMME","bonif_prom":5.0,"pct_subdeclara":75.0,"dano":58924.0,"envios":22,"actividad":"Textil"},{"des_usuario":"VILLARREAL LEANDRO","bonif_prom":22.5,"pct_subdeclara":0.0,"dano":0.0,"envios":11,"actividad":"Accesorios y/o Marroquinería"},{"des_usuario":"FLORENCIA GRIMALDI","bonif_prom":32.7,"pct_subdeclara":72.1,"dano":81054.0,"envios":498,"actividad":"Cosmética y/o Perfumería"},{"des_usuario":"AUGUSTO VIADA","bonif_prom":26.4,"pct_subdeclara":72.7,"dano":143769.0,"envios":12,"actividad":"Alimentos y/o Bebidas"},{"des_usuario":"LUCAS PONTNAU","bonif_prom":0.0,"pct_subdeclara":47.2,"dano":46815.0,"envios":53,"actividad":"Tecnología e Informática"}],"top_doble":[{"des_usuario":"LOGISTICA REALES","actividad":"Indumentaria e Indumentaria deportiva","envios":7925,"dano":160758096.0,"bonif_prom":0.274,"bonif_max":0.3,"pct_subdeclara":0.772,"cupones":3},{"des_usuario":"MYM NET S.A.","actividad":"Electrodomésticos","envios":2587,"dano":101838758.0,"bonif_prom":0.339,"bonif_max":0.35,"pct_subdeclara":0.741,"cupones":2},{"des_usuario":"EOWOL S.A. EOWOL S.A.","actividad":"Metalúrgica","envios":2183,"dano":75293332.0,"bonif_prom":0.3,"bonif_max":0.3,"pct_subdeclara":0.725,"cupones":1},{"des_usuario":"ONLINE SHOP","actividad":"Cosmética y/o Perfumería","envios":12517,"dano":59721740.0,"bonif_prom":0.267,"bonif_max":0.35,"pct_subdeclara":0.8,"cupones":6},{"des_usuario":"CM LOGISTICA","actividad":"Indumentaria e Indumentaria deportiva","envios":2599,"dano":56372175.0,"bonif_prom":0.21,"bonif_max":0.3,"pct_subdeclara":0.9,"cupones":3},{"des_usuario":"MOBAPP  LOGÍSTICA INTELIGENTE","actividad":"Tecnología e Informática","envios":2468,"dano":45145223.0,"bonif_prom":0.218,"bonif_max":0.25,"pct_subdeclara":0.866,"cupones":3},{"des_usuario":"MOBAPP EXPRESS","actividad":"Profesional y/o Jurídico","envios":2553,"dano":41176215.0,"bonif_prom":0.247,"bonif_max":0.25,"pct_subdeclara":0.838,"cupones":3},{"des_usuario":"EVER PAULINO GUTIERRES ALARCON","actividad":"Blanquería","envios":136,"dano":36210832.0,"bonif_prom":0.291,"bonif_max":0.3,"pct_subdeclara":0.783,"cupones":3},{"des_usuario":"MENDOZA TEXTIL LIVING","actividad":"Mueblería","envios":243,"dano":30317778.0,"bonif_prom":0.253,"bonif_max":0.3,"pct_subdeclara":0.869,"cupones":5},{"des_usuario":"TIENDA NUBE","actividad":"Indumentaria e Indumentaria deportiva","envios":1276,"dano":25380080.0,"bonif_prom":0.235,"bonif_max":0.74,"pct_subdeclara":0.848,"cupones":6},{"des_usuario":"SEBASTIAN TORRESI","actividad":"Construcción","envios":246,"dano":25120478.0,"bonif_prom":0.209,"bonif_max":0.3,"pct_subdeclara":0.914,"cupones":4},{"des_usuario":"DORMI ONLINE","actividad":"Mueblería","envios":406,"dano":21981775.0,"bonif_prom":0.267,"bonif_max":0.5,"pct_subdeclara":0.702,"cupones":3},{"des_usuario":"ANGUITA PAMELA","actividad":"Accesorios y/o Marroquinería","envios":1447,"dano":21115489.0,"bonif_prom":0.283,"bonif_max":0.3,"pct_subdeclara":0.862,"cupones":2},{"des_usuario":"TIENDA ONLINE","actividad":"Alimentos y/o Bebidas","envios":86725,"dano":20714382.0,"bonif_prom":0.272,"bonif_max":0.6,"pct_subdeclara":0.68,"cupones":16},{"des_usuario":"JUAN ARONICA","actividad":"Bazar y/o Decoración","envios":347,"dano":20516997.0,"bonif_prom":0.214,"bonif_max":0.37,"pct_subdeclara":0.816,"cupones":8}],"cup_nominativos":[{"cupon":"BALAHOGAR30","envios":2554,"clientes":1,"bonif_prom":35.0,"pct_subdeclara":76.5,"dano":101640112.80640289,"meses":3,"dano_unit":39796.0},{"cupon":"EOWOLSA30","envios":2183,"clientes":1,"bonif_prom":30.0,"pct_subdeclara":72.5,"dano":75293331.76295304,"meses":3,"dano_unit":34491.0},{"cupon":"LALANNETOMAS35","envios":11597,"clientes":1,"bonif_prom":33.3,"pct_subdeclara":78.0,"dano":57566561.113730654,"meses":3,"dano_unit":4964.0},{"cupon":"TOKIOLENCERIA30","envios":1544,"clientes":1,"bonif_prom":28.8,"pct_subdeclara":82.7,"dano":16835071.768769227,"meses":3,"dano_unit":10904.0},{"cupon":"S013-DESCC30","envios":839,"clientes":1,"bonif_prom":30.0,"pct_subdeclara":80.0,"dano":16658285.432607608,"meses":3,"dano_unit":19855.0},{"cupon":"TRYZORSHOP30","envios":5837,"clientes":1,"bonif_prom":25.6,"pct_subdeclara":77.8,"dano":16037405.483532902,"meses":3,"dano_unit":2748.0},{"cupon":"MATEROJO30","envios":391,"clientes":1,"bonif_prom":30.0,"pct_subdeclara":76.6,"dano":14715799.976966292,"meses":3,"dano_unit":37636.0},{"cupon":"MENDOZATEXTILLIVING30","envios":96,"clientes":1,"bonif_prom":30.0,"pct_subdeclara":100.0,"dano":13560977.504965456,"meses":3,"dano_unit":141260.0},{"cupon":"ENERFER35","envios":3040,"clientes":1,"bonif_prom":34.2,"pct_subdeclara":61.9,"dano":11481015.015912266,"meses":3,"dano_unit":3777.0},{"cupon":"FIDELIA30","envios":841,"clientes":1,"bonif_prom":29.6,"pct_subdeclara":84.7,"dano":11280929.545152983,"meses":3,"dano_unit":13414.0}]};
+
+function buildModCharts() {
+  // KPIs
+  document.getElementById('mod-kpis').innerHTML = [
+    {v: M.kpis.pct_envios_con_bonif+'%', l:'Envíos con descuento activo', c:'a'},
+    {v: M.kpis.bonif_prom_con_desc+'%',  l:'Descuento prom. (con desc.)', c:''},
+    {v: M.kpis.n_cupones_unicos.toLocaleString('es-AR'), l:'Cupones únicos en el período', c:''},
+    {v: M.kpis.n_clientes_doble.toLocaleString('es-AR'), l:'Clientes con doble beneficio', c:'r'},
+    {v: M.kpis.pct_dano_doble_benef+'%', l:'% daño — doble beneficio', c:'r'},
+    {v: M.kpis.bonif_prom_doble+'%',     l:'Desc. prom. doble beneficio', c:'a'},
+  ].map(k=>'<div class="kpi"><div class="kv '+k.c+'">'+k.v+'</div><div class="kl">'+k.l+'</div></div>').join('');
+
+  // Cuadrantes
+  const QBGS=['#FCEBEB','#FAEEDA','#E6F1FB','#EAF3DE'];
+  const QCS =['#A32D2D','#854F0B','#185FA5','#3B6D11'];
+  document.getElementById('quad-cards').innerHTML = M.cuadrantes.map((q,i)=>`
+    <div class="quad-card" style="background:${QBGS[i]};border-color:${QCS[i]}50">
+      <div class="quad-lbl" style="color:${QCS[i]}">${q.label}</div>
+      <div class="quad-num" style="color:${QCS[i]}">${q.pct_dano}% del daño total</div>
+      <div class="quad-sub">
+        <strong>${q.clientes.toLocaleString('es-AR')}</strong> clientes &nbsp;·&nbsp;
+        <strong>${fN(q.envios)}</strong> envíos &nbsp;·&nbsp;
+        <strong>${fM(q.dano)}</strong> daño est.
+      </div>
+    </div>`).join('');
+
+  // Chart: nivel de bonificación
+  new Chart(document.getElementById('chBonifCat'),{type:'bar',
+    data:{labels:M.by_bonif_cat.map(r=>r.bonif_cat),datasets:[
+      {label:'% subdeclara',data:M.by_bonif_cat.map(r=>r.pct_subdeclara),
+       backgroundColor:'rgba(24,95,165,.8)',borderRadius:4,yAxisID:'y'},
+      {type:'line',label:'Daño/envío ($)',data:M.by_bonif_cat.map(r=>r.dano_unit),
+       borderColor:'#A32D2D',backgroundColor:'rgba(163,45,45,.1)',
+       pointBackgroundColor:'#A32D2D',pointRadius:5,tension:.3,yAxisID:'y2'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{font:{size:10},padding:10}},
+        tooltip:{callbacks:{label:c=>c.datasetIndex===0?' '+c.raw+'% subdeclaran':' $'+fN(c.raw)+'/envío'}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:9.5},maxRotation:15}},
+        y:{position:'left',max:80,ticks:{callback:v=>v+'%',font:{size:9}},grid:{color:'rgba(0,0,0,.05)'},
+           title:{display:true,text:'% subdeclara',font:{size:9},color:'#185FA5'}},
+        y2:{position:'right',ticks:{callback:v=>'$'+fN(v),font:{size:9}},grid:{display:false},
+            title:{display:true,text:'Daño/envío ($)',font:{size:9},color:'#A32D2D'}}
+      }}});
+
+  // Chart: evolución mensual
+  new Chart(document.getElementById('chMesBonif'),{type:'bar',
+    data:{labels:M.by_month.map(r=>r.mes_str),datasets:[
+      {label:'% con descuento',data:M.by_month.map(r=>r.pct_con_bonif),
+       backgroundColor:'rgba(133,79,11,.7)',borderRadius:4,yAxisID:'y'},
+      {type:'line',label:'% subdeclara',data:M.by_month.map(r=>r.pct_subdeclara),
+       borderColor:'#A32D2D',backgroundColor:'rgba(163,45,45,.1)',
+       pointBackgroundColor:'#A32D2D',pointRadius:6,tension:.3,yAxisID:'y'},
+      {type:'line',label:'Desc. prom. (%)',data:M.by_month.map(r=>r.bonif_prom),
+       borderColor:'#185FA5',backgroundColor:'transparent',
+       pointBackgroundColor:'#185FA5',pointRadius:5,tension:.3,yAxisID:'y',borderDash:[4,3]},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{font:{size:10},padding:8}},
+        tooltip:{callbacks:{label:c=>' '+c.raw+'%'}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:11}}},
+              y:{ticks:{callback:v=>v+'%',font:{size:9}},grid:{color:'rgba(0,0,0,.05)'},max:80}}}});
+
+  // Chart: scatter
+  const sd=M.scatter;
+  const sc=sd.map(d=>{
+    const hd=d.bonif_prom>20,hs=d.pct_subdeclara>60;
+    if(hd&&hs)  return 'rgba(163,45,45,.65)';
+    if(hd&&!hs) return 'rgba(133,79,11,.55)';
+    if(!hd&&hs) return 'rgba(24,95,165,.55)';
+    return 'rgba(59,109,17,.45)';
+  });
+  new Chart(document.getElementById('chScatter'),{type:'scatter',
+    data:{datasets:[{label:'Clientes',
+      data:sd.map(d=>({x:d.bonif_prom,y:d.pct_subdeclara})),
+      backgroundColor:sc,
+      pointRadius:sd.map(d=>Math.min(Math.sqrt(d.dano/4e6)+3,18)),
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>{
+          const d=sd[ctx.dataIndex];
+          return[d.des_usuario,'Desc: '+d.bonif_prom+'%','Subdecl: '+d.pct_subdeclara+'%',fM(d.dano)];
+        }}}},
+      scales:{
+        x:{title:{display:true,text:'Descuento promedio (%)',font:{size:9}},
+           ticks:{callback:v=>v+'%',font:{size:9}},grid:{color:'rgba(0,0,0,.05)'}},
+        y:{title:{display:true,text:'% que subdeclara',font:{size:9}},
+           ticks:{callback:v=>v+'%',font:{size:9}},grid:{color:'rgba(0,0,0,.05)'},max:105}
+      }}});
+
+  // Chart: top cupones
+  const tc=M.top_cupones.slice(0,12);
+  new Chart(document.getElementById('chCupones'),{type:'bar',
+    data:{labels:tc.map(r=>r.cupon.length>18?r.cupon.slice(0,16)+'…':r.cupon),
+      datasets:[{label:'Daño ($M)',
+        data:tc.map(r=>+(r.dano/1e6).toFixed(1)),
+        backgroundColor:tc.map(r=>r.pct_subdeclara>=65?'rgba(163,45,45,.85)':r.pct_subdeclara>=50?'rgba(133,79,11,.75)':'rgba(24,95,165,.7)'),
+        borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>[` $${c.raw}M`,` ${tc[c.dataIndex].pct_subdeclara}% subdeclara`,` ${tc[c.dataIndex].bonif_prom}% desc.`]}}},
+      scales:{x:{ticks:{callback:v=>'$'+v+'M',font:{size:9}},grid:{color:'rgba(0,0,0,.05)'}},
+              y:{ticks:{font:{size:9}},grid:{display:false}}}}});
+
+  // Tabla doble beneficio
+  document.getElementById('tbl-doble').innerHTML=
+    '<thead><tr><th>#</th><th>Cliente</th><th>Actividad</th>'+
+    '<th class="r">Envíos</th><th class="r">Daño est.</th>'+
+    '<th class="r">Desc. prom.</th><th class="r">Desc. máx.</th>'+
+    '<th class="r">% subdecl.</th><th class="r">Cupones</th></tr></thead>'+
+    '<tbody>'+M.top_doble.map((r,i)=>{
+      const pct=Math.round(r.pct_subdeclara*100),bp=Math.round(r.bonif_prom*100),bx=Math.round(r.bonif_max*100);
+      return '<tr><td style="color:var(--gm)">'+(i+1)+'</td>'+
+        '<td><strong>'+r.des_usuario+'</strong></td>'+
+        '<td style="font-size:11px;color:var(--gm)">'+r.actividad+'</td>'+
+        '<td class="r">'+fN(r.envios)+'</td>'+
+        '<td class="r;font-weight:600">'+fM(r.dano)+'</td>'+
+        '<td class="r" style="color:var(--amber);font-weight:600">'+bp+'%</td>'+
+        '<td class="r" style="color:var(--amber)">'+bx+'%</td>'+
+        '<td class="r" style="color:var(--red);font-weight:600">'+pct+'%</td>'+
+        '<td class="r">'+r.cupones+'</td></tr>';
+    }).join('')+'</tbody>';
+
+  // Tabla nominativos
+  document.getElementById('tbl-nom').innerHTML=
+    '<thead><tr><th>Cupón nominativo</th><th class="r">Envíos</th>'+
+    '<th class="r">Daño est.</th><th class="r">Daño/envío</th>'+
+    '<th class="r">Desc. prom.</th><th class="r">% subdecl.</th><th class="r">Meses</th></tr></thead>'+
+    '<tbody>'+M.cup_nominativos.map((r,i)=>{
+      const cls=r.pct_subdeclara>=70?'color:var(--red);font-weight:600':r.pct_subdeclara>=50?'color:var(--amber)':'';
+      return '<tr><td><strong>'+r.cupon+'</strong></td>'+
+        '<td class="r">'+fN(r.envios)+'</td>'+
+        '<td class="r">'+fM(r.dano)+'</td>'+
+        '<td class="r" style="font-weight:600">$'+fN(r.dano_unit)+'</td>'+
+        '<td class="r" style="color:var(--amber)">'+r.bonif_prom+'%</td>'+
+        '<td class="r" style="'+cls+'">'+r.pct_subdeclara+'%</td>'+
+        '<td class="r">'+r.meses+'</td></tr>';
+    }).join('')+'</tbody>';
+}
+</script>
+
+
+</body>
+</html>
